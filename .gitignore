@@ -1,15 +1,23 @@
+# Gradle files
 *.iml
 .gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
 /build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+/local.properties
+/.idea
+.DS_Store
+.gradle/
+
+# Android Studio generated files
+.idea/*
+.vscode/
+.classpath
+.project
+
+# Keystore files
+*.jks
+
+# Node.js dependencies (if you have a Node server)
+/node_modules/
+
+# Mac system files
+.DS_Store
