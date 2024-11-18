@@ -16,6 +16,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.ArrayList;
 
 
@@ -61,6 +64,30 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             // Launch AddFoodItemActivity and wait for result
             Intent intent = new Intent(MainActivity.this, AddFoodItemActivity.class);
             addFoodItemLauncher.launch(intent);
+        });
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.navigation_inventory);
+
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.navigation_settings) {
+                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if (item.getItemId() == R.id.navigation_inventory) {
+                // Stay in MainActivity (Inventory tab)
+                return true;
+            } else if (item.getItemId() == R.id.navigation_shopping_list) {
+                // Open ShoppingListActivity
+                Intent shoppingListIntent = new Intent(MainActivity.this, ShoppingListActivity.class);
+                startActivity(shoppingListIntent);
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            }
+            return false;
         });
     }
 
