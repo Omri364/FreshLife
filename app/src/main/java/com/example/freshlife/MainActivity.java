@@ -1,6 +1,7 @@
 package com.example.freshlife;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,12 +9,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.Calendar;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,6 +27,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.text.ParseException;
@@ -30,6 +36,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import android.app.AlertDialog;
+import android.view.LayoutInflater;
 
 
 public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDeleteClickListener {
@@ -108,12 +118,8 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         // Set default sorting to "Sort by Expiration" (index 2 in the string array)
         sortSpinner.setSelection(2); // Set default selection (0-based index)
 
-        Button addFoodButton = findViewById(R.id.addFoodButton);
-        addFoodButton.setOnClickListener(v -> {
-            // Launch AddFoodItemActivity and wait for result
-            Intent intent = new Intent(MainActivity.this, AddFoodItemActivity.class);
-            addFoodItemLauncher.launch(intent);
-        });
+        FloatingActionButton addFoodButton = findViewById(R.id.addFoodButton);
+        addFoodButton.setOnClickListener(v -> showAddFoodDialog());
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.navigation_inventory);
@@ -223,6 +229,82 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             } catch (ParseException e) {
                 e.printStackTrace();
                 return 0;
+            }
+        });
+    }
+
+    private void showAddFoodDialog() {
+        // Inflate the custom dialog layout
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_add_food, null);
+
+        // Initialize dialog elements
+        EditText foodNameEditText = dialogView.findViewById(R.id.dialogFoodNameEditText);
+        EditText quantityEditText = dialogView.findViewById(R.id.dialogQuantityEditText);
+        TextView expirationDateTextView = dialogView.findViewById(R.id.dialogExpirationDateTextView);
+        Spinner categorySpinner = dialogView.findViewById(R.id.dialogCategorySpinner);
+
+        // Set up category spinner
+        String[] categories = {"Dairy", "Meat", "Vegetables", "Fruits", "Snacks"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(adapter);
+
+        // Set up expiration date picker
+        expirationDateTextView.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    this,
+                    (view, selectedYear, selectedMonth, selectedDay) -> {
+                        String date = String.format(Locale.getDefault(), "%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay);
+                        expirationDateTextView.setText(date);
+                    },
+                    year, month, day
+            );
+            datePickerDialog.show();
+        });
+
+        // Build and show the dialog
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Add Food Item")
+                .setView(dialogView)
+                .setPositiveButton("Add", (dialogInterface, i) -> {
+                    String name = foodNameEditText.getText().toString();
+                    int quantity = Integer.parseInt(quantityEditText.getText().toString());
+                    String expirationDate = expirationDateTextView.getText().toString();
+                    String category = categorySpinner.getSelectedItem().toString();
+
+                    // Add the item (update the backend and RecyclerView)
+                    addFoodItem(new FoodItem(name, quantity, expirationDate, category));
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        dialog.show();
+    }
+
+    private void addFoodItem(FoodItem foodItem) {
+        ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
+        Call<FoodItem> call = apiService.addFoodItem(foodItem);
+
+        call.enqueue(new Callback<FoodItem>() {
+            @Override
+            public void onResponse(Call<FoodItem> call, Response<FoodItem> response) {
+                if (response.isSuccessful()) {
+                    foodItems.add(response.body());
+                    foodAdapter.notifyItemInserted(foodItems.size() - 1);
+                } else {
+                    Toast.makeText(MainActivity.this, "Failed to add item", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FoodItem> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

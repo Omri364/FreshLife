@@ -29,6 +29,7 @@
         android:contentDescription="Add Item"
         android:src="@drawable/ic_add"
         app:backgroundTint="@color/primaryColor"
+        app:tint="@android:color/white"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent" />
 
