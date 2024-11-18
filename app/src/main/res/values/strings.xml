@@ -5,7 +5,7 @@
         <item>Vegetable</item>
         <item>Meat</item>
         <item>Fruit</item>
-        <item>Beverage</item>
+        <item>Drink</item>
         <item>Other</item>
     </string-array>
     <string-array name="sort_options">

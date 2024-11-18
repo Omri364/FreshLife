@@ -49,22 +49,25 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         int backgroundColor = determineBackgroundColor(foodItem.getExpirationDate());
         holder.itemView.setBackgroundColor(backgroundColor);
 
-        holder.categoryIcon.setImageResource(R.drawable.ic_category_placeholder); // Replace with actual drawable // TODO: replace accordingly
-//        // Set category icon based on category
-//        switch (foodItem.getCategory()) {
-//            case "Dairy":
-//                holder.categoryIcon.setImageResource(R.drawable.ic_dairy); // Replace with actual drawable
-//                break;
-//            case "Vegetable":
-//                holder.categoryIcon.setImageResource(R.drawable.ic_vegetable); // Replace with actual drawable
-//                break;
-//            case "Meat":
-//                holder.categoryIcon.setImageResource(R.drawable.ic_meat); // Replace with actual drawable
-//                break;
-//            default:
-//                holder.categoryIcon.setImageResource(R.drawable.ic_category_placeholder); // Default icon
-//                break;
-//        }
+//        holder.categoryIcon.setImageResource(R.drawable.ic_category_placeholder); // Replace with actual drawable // TODO: replace accordingly
+        // Set category icon based on category
+        switch (foodItem.getCategory()) {
+            case "Dairy":
+                holder.categoryIcon.setImageResource(R.drawable.ic_dairy);
+                break;
+            case "Vegetable":
+                holder.categoryIcon.setImageResource(R.drawable.ic_vegtable);
+                break;
+            case "Meat":
+                holder.categoryIcon.setImageResource(R.drawable.ic_meat);
+                break;
+            case "Drink":
+                holder.categoryIcon.setImageResource(R.drawable.ic_drink);
+                break;
+            default:
+                holder.categoryIcon.setImageResource(R.drawable.ic_food); // Default icon
+                break;
+        }
 
         // Handle delete button click
         holder.deleteButton.setOnClickListener(v -> onDeleteClickListener.onDeleteClick(foodItem, position));

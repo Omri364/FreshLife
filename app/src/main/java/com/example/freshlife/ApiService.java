@@ -18,5 +18,14 @@ public interface ApiService {
 
     @DELETE("/food-items/{id}")
     Call<Void> deleteFoodItem(@Path("id") String foodItemId);
+
+    @GET("/shopping-items")
+    Call<List<ShoppingItem>> getShoppingItems();
+
+    @POST("/shopping-items")
+    Call<ShoppingItem> addShoppingItem(@Body ShoppingItem shoppingItem);
+
+    @DELETE("/shopping-items/{id}")
+    Call<Void> deleteShoppingItem(@Path("id") String id);
 }
 
