@@ -9,19 +9,22 @@ public class FoodItem implements Serializable {
     private String name;
     private int quantity;
     private String expirationDate;
+    private String category;
 
     // Constructor
-    public FoodItem(String name, int quantity, String expirationDate) {
+    public FoodItem(String name, int quantity, String expirationDate, String category) {
         this.name = name;
         this.quantity = quantity;
         this.expirationDate = expirationDate;
+        this.category = category;
     }
 
-    public FoodItem(String id, String name, int quantity, String expirationDate) {
+    public FoodItem(String id, String name, int quantity, String expirationDate, String category) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;
         this.expirationDate = expirationDate;
+        this.category = category;
     }
 
     // Getters
@@ -43,5 +46,6 @@ public class FoodItem implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
+    public String getCategory() { return category; }
 }
 

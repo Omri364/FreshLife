@@ -3,8 +3,10 @@ package com.example.freshlife;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +20,7 @@ public class AddFoodItemActivity extends AppCompatActivity {
 
     private EditText nameEditText, quantityEditText;
     private TextView expirationDateTextView;
+    private Spinner categorySpinner;
     private Button addButton;
     private int selectedYear, selectedMonth, selectedDay;
 
@@ -29,7 +32,17 @@ public class AddFoodItemActivity extends AppCompatActivity {
         nameEditText = findViewById(R.id.nameEditText);
         quantityEditText = findViewById(R.id.quantityEditText);
         expirationDateTextView = findViewById(R.id.expirationDateTextView);
+        categorySpinner = findViewById(R.id.categorySpinner);
         addButton = findViewById(R.id.addButton);
+
+        // Populate category spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.categories,
+                android.R.layout.simple_spinner_item
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(adapter);
 
         // Get current date for initial date picker values
         Calendar calendar = Calendar.getInstance();
@@ -56,8 +69,9 @@ public class AddFoodItemActivity extends AppCompatActivity {
             String name = nameEditText.getText().toString();
             int quantity = Integer.parseInt(quantityEditText.getText().toString());
             String expirationDate = expirationDateTextView.getText().toString();
+            String category = categorySpinner.getSelectedItem().toString();
 
-            FoodItem foodItem = new FoodItem(name, quantity, expirationDate);
+            FoodItem foodItem = new FoodItem(name, quantity, expirationDate, category);
             addFoodItem(foodItem);
         });
     }

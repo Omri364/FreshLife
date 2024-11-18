@@ -6,4 +6,7 @@
     <color name="backgroundColor">#F5F5F5</color> <!-- Light gray for background -->
     <color name="textColor">#212121</color> <!-- Dark gray for text -->
     <color name="secondaryTextColor">#757575</color> <!-- Lighter gray for secondary text -->
+    <color name="white">#FFFFFF</color>
+    <color name="light_red">#FFCDD2</color> <!-- Light red for expired items -->
+    <color name="light_yellow">#FFF9C4</color> <!-- Light yellow for items expiring soon -->
 </resources>

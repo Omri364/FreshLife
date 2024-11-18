@@ -4,7 +4,11 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +24,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDeleteClickListener {
@@ -53,11 +63,50 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         foodItemsRecyclerView = findViewById(R.id.foodItemsRecyclerView);
         foodItemsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        foodAdapter = new FoodAdapter(foodItems, this);
+        foodAdapter = new FoodAdapter(this, foodItems, this);
         foodItemsRecyclerView.setAdapter(foodAdapter);
+
+        // Spinner for sorting
+        Spinner sortSpinner = findViewById(R.id.sortSpinner);
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.sort_options, // String array defined in res/values/strings.xml
+                android.R.layout.simple_spinner_item
+        );
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortSpinner.setAdapter(spinnerAdapter);
+
+
+
+        // Handle sorting selection
+        sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0: // Alphabetical
+                        sortAlphabetically();
+                        break;
+                    case 1: // By Category
+                        sortByCategory();
+                        break;
+                    case 2: // By Expiration Date
+                        sortByExpiration();
+                        break;
+                }
+                foodAdapter.notifyDataSetChanged(); // Refresh RecyclerView
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
 
         // Fetch and display existing food items from the backend
         fetchFoodItems();
+
+        // Set default sorting to "Sort by Expiration" (index 2 in the string array)
+        sortSpinner.setSelection(2); // Set default selection (0-based index)
 
         Button addFoodButton = findViewById(R.id.addFoodButton);
         addFoodButton.setOnClickListener(v -> {
@@ -101,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                 if (response.isSuccessful()) {
                     foodItems.clear();
                     foodItems.addAll(response.body());
+                    sortByExpiration(); // apply default sorting
                     foodAdapter.notifyDataSetChanged();
                 } else {
                     Log.e("MainActivity", "Request failed with code: " + response.code());
@@ -150,6 +200,29 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 Log.e("MainActivity", "Failed to delete item", t);
+            }
+        });
+    }
+
+    // Sorting methods
+    private void sortAlphabetically() {
+        Collections.sort(foodItems, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
+    }
+
+    private void sortByCategory() {
+        Collections.sort(foodItems, (o1, o2) -> o1.getCategory().compareToIgnoreCase(o2.getCategory()));
+    }
+
+    private void sortByExpiration() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Collections.sort(foodItems, (o1, o2) -> {
+            try {
+                Date date1 = sdf.parse(o1.getExpirationDate());
+                Date date2 = sdf.parse(o2.getExpirationDate());
+                return date1.compareTo(date2);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return 0;
             }
         });
     }

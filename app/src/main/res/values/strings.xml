@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">FreshLife</string>
+    <string-array name="categories">
+        <item>Dairy</item>
+        <item>Vegetable</item>
+        <item>Meat</item>
+        <item>Fruit</item>
+        <item>Beverage</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="sort_options">
+        <item>Sort By A-Z</item>
+        <item>Sort By Category</item>
+        <item>Sort By Expiration</item>
+    </string-array>
 </resources>

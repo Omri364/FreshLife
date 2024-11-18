@@ -21,10 +21,10 @@
             android:src="@drawable/baseline_close_24"
             android:contentDescription="Delete"
             android:background="?android:attr/selectableItemBackground"
+            android:tint="@color/primaryColor"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:tint="@color/primaryColor" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <!-- Food Name -->
         <TextView
@@ -38,23 +38,31 @@
             android:layout_marginStart="8dp"
             app:layout_constraintStart_toEndOf="@id/deleteButton"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/foodExpirationTextView" />
+            app:layout_constraintEnd_toStartOf="@id/categoryIcon" />
 
-        <!-- Expiration Date -->
+        <!-- Expiration Information -->
         <TextView
-            android:id="@+id/foodExpirationTextView"
-            android:layout_width="wrap_content"
+            android:id="@+id/expirationInfoTextView"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="2024-12-02"
+            android:text="Expires in X days"
             android:textSize="14sp"
             android:fontFamily="sans-serif"
             android:textColor="@color/secondaryTextColor"
+            app:layout_constraintStart_toStartOf="@id/foodNameTextView"
+            app:layout_constraintTop_toBottomOf="@id/foodNameTextView"
+            app:layout_constraintEnd_toStartOf="@id/categoryIcon" />
+
+        <!-- Category Icon -->
+        <ImageView
+            android:id="@+id/categoryIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_marginStart="8dp"
-            app:layout_constraintStart_toEndOf="@id/foodNameTextView"
+            android:contentDescription="Category Icon"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
+            android:src="@drawable/ic_category_placeholder" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
