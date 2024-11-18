@@ -22,11 +22,14 @@
             android:inputType="number"
             android:hint="Quantity" />
 
-        <EditText
-            android:id="@+id/expirationDateEditText"
+        <TextView
+            android:id="@+id/expirationDateTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Expiration Date (YYYY-MM-DD)" />
+            android:hint="Expiration Date"
+            android:padding="16dp"
+            android:textSize="16sp"
+            android:background="?android:attr/selectableItemBackground" />
 
         <Button
             android:id="@+id/addButton"

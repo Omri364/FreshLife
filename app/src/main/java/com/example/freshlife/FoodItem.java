@@ -1,7 +1,11 @@
 package com.example.freshlife;
 
-public class FoodItem {
+import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 
+public class FoodItem implements Serializable {
+    @SerializedName("_id")  // Maps MongoDB's _id to id
+    private String id;
     private String name;
     private int quantity;
     private String expirationDate;
@@ -13,7 +17,17 @@ public class FoodItem {
         this.expirationDate = expirationDate;
     }
 
+    public FoodItem(String id, String name, int quantity, String expirationDate) {
+        this.id = id;
+        this.name = name;
+        this.quantity = quantity;
+        this.expirationDate = expirationDate;
+    }
+
     // Getters
+    public String getId() {
+        return id;
+    }
     public String getName() {
         return name;
     }
@@ -24,6 +38,10 @@ public class FoodItem {
 
     public String getExpirationDate() {
         return expirationDate;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
 

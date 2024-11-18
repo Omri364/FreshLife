@@ -14,6 +14,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Get backend IP from local.properties
+        val backendIp: String = project.findProperty("backend_ip") as String? ?: "localhost"
+
+        // Pass the backend IP to BuildConfig
+        buildConfigField("String", "BACKEND_IP", "\"$backendIp\"")
+
     }
 
     buildTypes {
@@ -25,6 +32,11 @@ android {
             )
         }
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -39,7 +51,10 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
 }
+

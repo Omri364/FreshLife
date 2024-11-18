@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="primaryColor">#4CAF50</color> <!-- Green for primary color -->
+    <color name="primaryDarkColor">#388E3C</color> <!-- Darker green -->
+    <color name="accentColor">#FF9800</color> <!-- Orange for accent -->
+    <color name="backgroundColor">#F5F5F5</color> <!-- Light gray for background -->
+    <color name="textColor">#212121</color> <!-- Dark gray for text -->
+    <color name="secondaryTextColor">#757575</color> <!-- Lighter gray for secondary text -->
 </resources>
