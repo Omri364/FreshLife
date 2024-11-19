@@ -13,11 +13,10 @@
         android:hint="Product Name"
         android:inputType="text" />
 
-    <EditText
-        android:id="@+id/productCategoryInput"
+    <Spinner
+        android:id="@+id/dialogCategorySpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Product Category"
-        android:inputType="text" />
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>

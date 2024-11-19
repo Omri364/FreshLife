@@ -3,6 +3,7 @@ package com.example.freshlife;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,7 +16,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,6 +30,7 @@ import retrofit2.Response;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
+import com.example.freshlife.utils.RecyclerViewSwipeDecorator;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -41,6 +45,7 @@ import java.util.Locale;
 
 import android.app.AlertDialog;
 import android.view.LayoutInflater;
+import androidx.recyclerview.widget.ItemTouchHelper;
 
 
 public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDeleteClickListener {
@@ -74,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         foodItemsRecyclerView = findViewById(R.id.foodItemsRecyclerView);
         foodItemsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        foodAdapter = new FoodAdapter(this, foodItems, this);
+        foodAdapter = new FoodAdapter(this, foodItems, this ,this::showEditFoodDialog);
         foodItemsRecyclerView.setAdapter(foodAdapter);
 
         // Spinner for sorting
@@ -86,8 +91,6 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         );
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortSpinner.setAdapter(spinnerAdapter);
-
-
 
         // Handle sorting selection
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -145,6 +148,42 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             }
             return false;
         });
+
+        // Add swipe-to-delete functionality
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false; // No drag-and-drop functionality
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                FoodItem foodItem = foodItems.get(position);
+
+                // Delete item and check if it should be added to the shopping list
+                deleteFoodItem(foodItem, position);
+
+                if (foodItem.getReplenishAutomatically()) {
+                    addToShoppingList(foodItem);
+                }
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+                                    @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
+                                    int actionState, boolean isCurrentlyActive) {
+                new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                        .addBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.deleteBackground))
+                        .addActionIcon(R.drawable.ic_trash)
+                        .create()
+                        .decorate();
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        });
+
+        itemTouchHelper.attachToRecyclerView(foodItemsRecyclerView);
     }
 
     private void fetchFoodItems() {
@@ -191,9 +230,6 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
     }
 
     private void deleteFoodItem(FoodItem foodItem, int position) {
-        Log.d("MainActivity", "Deleting item with id: " + foodItem.getId()); // Log the id
-
-        // Make DELETE request to the backend
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
         Call<Void> call = apiService.deleteFoodItem(foodItem.getId());
 
@@ -205,14 +241,13 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                     foodAdapter.notifyItemRemoved(position);
                     Toast.makeText(MainActivity.this, "Item deleted", Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.e("MainActivity", "Delete request failed with code: " + response.code());
-                    Toast.makeText(MainActivity.this, "Delete failed: " + response.message(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Failed to delete item: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Log.e("MainActivity", "Failed to delete item", t);
+                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -355,6 +390,124 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                 Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // Show edit food item dialog
+    private void showEditFoodDialog(FoodItem foodItem, int position) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_add_food, null);
+
+        // Initialize dialog elements
+        EditText foodNameEditText = dialogView.findViewById(R.id.dialogFoodNameEditText);
+        EditText quantityEditText = dialogView.findViewById(R.id.dialogQuantityEditText);
+        TextView expirationDateTextView = dialogView.findViewById(R.id.dialogExpirationDateTextView);
+        Spinner categorySpinner = dialogView.findViewById(R.id.dialogCategorySpinner);
+        CheckBox replenishCheckBox = dialogView.findViewById(R.id.dialogReplenishCheckBox);
+
+        // Populate the fields with existing data
+        foodNameEditText.setText(foodItem.getName());
+        quantityEditText.setText(String.valueOf(foodItem.getQuantity()));
+        expirationDateTextView.setText(foodItem.getExpirationDate());
+        replenishCheckBox.setChecked(foodItem.getReplenishAutomatically());
+
+        // Populate category spinner
+        String[] categories = getResources().getStringArray(R.array.categories);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(adapter);
+        categorySpinner.setSelection(getCategoryIndex(foodItem.getCategory(), categories));
+
+        // Set up expiration date picker
+        expirationDateTextView.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    this,
+                    (view, selectedYear, selectedMonth, selectedDay) -> {
+                        String date = String.format(Locale.getDefault(), "%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay);
+                        expirationDateTextView.setText(date);
+                    },
+                    year, month, day
+            );
+            datePickerDialog.show();
+        });
+
+        // Build and show the dialog
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Edit Food Item")
+                .setView(dialogView)
+                .setPositiveButton("Save", null)
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        dialog.show();
+
+        // Override the PositiveButton to handle validation
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String name = foodNameEditText.getText().toString().trim();
+            String quantityStr = quantityEditText.getText().toString().trim();
+            String expirationDate = expirationDateTextView.getText().toString().trim();
+            String category = categorySpinner.getSelectedItem().toString();
+            boolean replenishAutomatically = replenishCheckBox.isChecked();
+
+            // Validate inputs
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Please enter the food name", Toast.LENGTH_SHORT).show();
+            } else if (quantityStr.isEmpty()) {
+                Toast.makeText(this, "Please enter the quantity", Toast.LENGTH_SHORT).show();
+            } else if (expirationDate.isEmpty()) {
+                Toast.makeText(this, "Please select an expiration date", Toast.LENGTH_SHORT).show();
+            } else {
+                int quantity = Integer.parseInt(quantityStr);
+
+                // Update the item
+                foodItem.setName(name);
+                foodItem.setQuantity(quantity);
+                foodItem.setExpirationDate(expirationDate);
+                foodItem.setCategory(category);
+                foodItem.setReplenishAutomatically(replenishAutomatically);
+
+                updateFoodItem(foodItem, position);
+                dialog.dismiss();
+            }
+        });
+    }
+
+    // Update food item on the backend
+    private void updateFoodItem(FoodItem foodItem, int position) {
+        ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
+        Call<FoodItem> call = apiService.updateFoodItem(foodItem.getId(), foodItem);
+
+        call.enqueue(new Callback<FoodItem>() {
+            @Override
+            public void onResponse(Call<FoodItem> call, Response<FoodItem> response) {
+                if (response.isSuccessful()) {
+                    foodItems.set(position, foodItem);
+                    foodAdapter.notifyItemChanged(position);
+                    Toast.makeText(MainActivity.this, "Item updated", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Failed to update item", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FoodItem> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Get category index for spinner
+    private int getCategoryIndex(String category, String[] categories) {
+        for (int i = 0; i < categories.length; i++) {
+            if (categories[i].equalsIgnoreCase(category)) {
+                return i;
+            }
+        }
+        return 0; // Default to the first category
     }
 }
 

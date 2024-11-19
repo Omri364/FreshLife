@@ -7,6 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.DELETE;
 import retrofit2.http.Path;
+import retrofit2.http.PUT;
 
 public interface ApiService {
 
@@ -19,6 +20,9 @@ public interface ApiService {
     @DELETE("/food-items/{id}")
     Call<Void> deleteFoodItem(@Path("id") String foodItemId);
 
+    @PUT("/food-items/{id}")
+    Call<FoodItem> updateFoodItem(@Path("id") String id, @Body FoodItem foodItem);
+
     @GET("/shopping-items")
     Call<List<ShoppingItem>> getShoppingItems();
 
@@ -27,5 +31,9 @@ public interface ApiService {
 
     @DELETE("/shopping-items/{id}")
     Call<Void> deleteShoppingItem(@Path("id") String id);
+
+    @PUT("/shopping-items/{id}")
+    Call<ShoppingItem> updateShoppingItem(@Path("id") String id, @Body ShoppingItem shoppingItem);
+
 }
 

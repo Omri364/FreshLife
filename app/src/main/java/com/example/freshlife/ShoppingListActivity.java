@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -79,7 +82,7 @@ public class ShoppingListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.shoppingRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new ShoppingListAdapter(this, shoppingItems);
+        adapter = new ShoppingListAdapter(this, shoppingItems, this::showEditShoppingDialog);
         recyclerView.setAdapter(adapter);
 
         FloatingActionButton addButton = findViewById(R.id.addButton);
@@ -172,32 +175,49 @@ public class ShoppingListActivity extends AppCompatActivity {
     }
 
     private void showAddProductDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Product to Shopping List");
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_add_product, null);
 
-        // Inflate a custom layout for the dialog
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_product, null);
-        builder.setView(dialogView);
+        // Initialize dialog elements
+        EditText itemNameEditText = dialogView.findViewById(R.id.productNameInput);
+        Spinner categorySpinner = dialogView.findViewById(R.id.dialogCategorySpinner);
 
-        EditText productNameInput = dialogView.findViewById(R.id.productNameInput);
-        EditText productCategoryInput = dialogView.findViewById(R.id.productCategoryInput);
+        // Populate category spinner
+        String[] categories = getResources().getStringArray(R.array.categories);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(adapter);
 
-        builder.setPositiveButton("Add", (dialog, which) -> {
-            String productName = productNameInput.getText().toString().trim();
-            String productCategory = productCategoryInput.getText().toString().trim();
+        // Build and show the dialog
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Add Product to Shopping List")
+                .setView(dialogView)
+                .setPositiveButton("Add", null)  // We'll override this button later for validation
+                .setNegativeButton("Cancel", null)
+                .create();
 
-            if (!productName.isEmpty() && !productCategory.isEmpty()) {
-                addShoppingItem(new ShoppingItem(productName, false, productCategory));
+        dialog.show();
+
+        // Override the PositiveButton to handle validation and addition
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String name = itemNameEditText.getText().toString().trim();
+            String category = categorySpinner.getSelectedItem().toString();
+
+            // Validate inputs
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Please enter the item name", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                // Create a new ShoppingItem object
+                ShoppingItem newItem = new ShoppingItem(name,false, category); // Assuming "false" for initial checked state
+
+                // Add the item to the shopping list
+                addShoppingItem(newItem);
+
+                dialog.dismiss(); // Close the dialog
             }
         });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
+
 
 
     private void setupSwipeToDelete() {
@@ -229,5 +249,87 @@ public class ShoppingListActivity extends AppCompatActivity {
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    // Show edit shopping item dialog
+    private void showEditShoppingDialog(ShoppingItem shoppingItem, int position) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_add_product, null);
+
+        // Initialize dialog elements
+        EditText itemNameEditText = dialogView.findViewById(R.id.productNameInput);
+        Spinner categorySpinner = dialogView.findViewById(R.id.dialogCategorySpinner);
+
+        // Populate the fields with existing data
+        itemNameEditText.setText(shoppingItem.getName());
+
+        // Populate category spinner
+        String[] categories = getResources().getStringArray(R.array.categories);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(adapter);
+        categorySpinner.setSelection(getCategoryIndex(shoppingItem.getCategory(), categories));
+
+        // Build and show the dialog
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Edit Shopping Item")
+                .setView(dialogView)
+                .setPositiveButton("Save", null)
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        dialog.show();
+
+        // Override the PositiveButton to handle validation
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String name = itemNameEditText.getText().toString().trim();
+            String category = categorySpinner.getSelectedItem().toString();
+
+            // Validate inputs
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Please enter the item name", Toast.LENGTH_SHORT).show();
+            } else {
+                // Update the item
+                shoppingItem.setName(name);
+                shoppingItem.setCategory(category);
+
+                updateShoppingItem(shoppingItem, position);
+                dialog.dismiss();
+            }
+        });
+    }
+
+    // Update shopping item on the backend
+    private void updateShoppingItem(ShoppingItem shoppingItem, int position) {
+        ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
+        Call<ShoppingItem> call = apiService.updateShoppingItem(shoppingItem.getId(), shoppingItem);
+
+        call.enqueue(new Callback<ShoppingItem>() {
+            @Override
+            public void onResponse(Call<ShoppingItem> call, Response<ShoppingItem> response) {
+                if (response.isSuccessful()) {
+                    shoppingItems.set(position, shoppingItem);
+                    adapter.notifyItemChanged(position);
+                    Toast.makeText(ShoppingListActivity.this, "Item updated", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ShoppingListActivity.this, "Failed to update item", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ShoppingItem> call, Throwable t) {
+                Toast.makeText(ShoppingListActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Get category index for spinner
+    private int getCategoryIndex(String category, String[] categories) {
+        for (int i = 0; i < categories.length; i++) {
+            if (categories[i].equalsIgnoreCase(category)) {
+                return i;
+            }
+        }
+        return 0; // Default to the first category
     }
 }

@@ -52,5 +52,11 @@ public class FoodItem implements Serializable {
     public String getCategory() { return category; }
 
     public boolean getReplenishAutomatically() { return replenishAutomatically; }
+
+    public void setName(String name) { this.name = name; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public void setExpirationDate(String expirationDate) { this.expirationDate = expirationDate; }
+    public void setCategory(String category) { this.category = category; }
+    public void setReplenishAutomatically(boolean replenishAutomatically) { this.replenishAutomatically = replenishAutomatically; }
 }
 

@@ -22,11 +22,13 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     private List<FoodItem> foodItemList;
     private OnDeleteClickListener onDeleteClickListener;
     private Context context;
+    private final OnEditClickListener editClickListener;
 
-    public FoodAdapter(Context context, List<FoodItem> foodItemList, OnDeleteClickListener listener) {
+    public FoodAdapter(Context context, List<FoodItem> foodItemList, OnDeleteClickListener listener, OnEditClickListener editClickListener) {
         this.context = context;
         this.foodItemList = foodItemList;
         this.onDeleteClickListener = listener;
+        this.editClickListener = editClickListener;
     }
 
     @NonNull
@@ -49,7 +51,6 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         int backgroundColor = determineBackgroundColor(foodItem.getExpirationDate());
         holder.itemView.setBackgroundColor(backgroundColor);
 
-//        holder.categoryIcon.setImageResource(R.drawable.ic_category_placeholder); // Replace with actual drawable // TODO: replace accordingly
         // Set category icon based on category
         switch (foodItem.getCategory()) {
             case "Dairy":
@@ -72,7 +73,8 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         // Handle delete button click
         holder.deleteButton.setOnClickListener(v -> onDeleteClickListener.onDeleteClick(foodItem, position));
 
-
+        // Handle item click for editing
+        holder.itemView.setOnClickListener(v -> editClickListener.onEditClick(foodItem, position));
     }
 
     @Override
@@ -99,6 +101,11 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     // Interface for handling delete click events
     public interface OnDeleteClickListener {
         void onDeleteClick(FoodItem foodItem, int position);
+    }
+
+    // Interface for item edit click listener
+    public interface OnEditClickListener {
+        void onEditClick(FoodItem foodItem, int position);
     }
 
     private String calculateDaysUntilExpiration(String expirationDate) {

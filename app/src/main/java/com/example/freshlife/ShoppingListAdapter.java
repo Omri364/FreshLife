@@ -18,10 +18,12 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     private List<ShoppingItem> shoppingItems;
     private Context context;
+    private final OnEditClickListener editClickListener;
 
-    public ShoppingListAdapter(Context context, List<ShoppingItem> shoppingItems) {
+    public ShoppingListAdapter(Context context, List<ShoppingItem> shoppingItems, OnEditClickListener editClickListener) {
         this.context = context;
         this.shoppingItems = shoppingItems;
+        this.editClickListener = editClickListener;
     }
 
     @NonNull
@@ -55,6 +57,9 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
             moveCheckedItems(); // Reorganize the list (checked items at the bottom)
             notifyDataSetChanged(); // Refresh RecyclerView
         });
+
+        // Handle item click for editing
+        holder.itemView.setOnClickListener(v -> editClickListener.onEditClick(item, position));
     }
 
     @Override
@@ -90,5 +95,10 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
             radioButton = itemView.findViewById(R.id.itemCheckBox);
             itemContainer = itemView.findViewById(R.id.itemContainer);
         }
+    }
+
+    // Interface for item edit click listener
+    public interface OnEditClickListener {
+        void onEditClick(ShoppingItem shoppingItem, int position);
     }
 }
