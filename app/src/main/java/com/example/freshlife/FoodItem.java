@@ -10,21 +10,24 @@ public class FoodItem implements Serializable {
     private int quantity;
     private String expirationDate;
     private String category;
+    private boolean replenishAutomatically;
 
     // Constructor
-    public FoodItem(String name, int quantity, String expirationDate, String category) {
+    public FoodItem(String name, int quantity, String expirationDate, String category, boolean replenishAutomatically) {
         this.name = name;
         this.quantity = quantity;
         this.expirationDate = expirationDate;
         this.category = category;
+        this.replenishAutomatically = replenishAutomatically;
     }
 
-    public FoodItem(String id, String name, int quantity, String expirationDate, String category) {
+    public FoodItem(String id, String name, int quantity, String expirationDate, String category, boolean replenishAutomatically) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;
         this.expirationDate = expirationDate;
         this.category = category;
+        this.replenishAutomatically = replenishAutomatically;
     }
 
     // Getters
@@ -47,5 +50,7 @@ public class FoodItem implements Serializable {
         this.id = id;
     }
     public String getCategory() { return category; }
+
+    public boolean getReplenishAutomatically() { return replenishAutomatically; }
 }
 

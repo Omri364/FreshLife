@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -178,7 +179,13 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         new AlertDialog.Builder(this)
                 .setTitle("Delete Food Item")
                 .setMessage("Are you sure you want to delete this item?")
-                .setPositiveButton("Yes", (dialog, which) -> deleteFoodItem(foodItem, position))
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    deleteFoodItem(foodItem, position);
+                    // If replenishAutomatically is checked, add to shopping list
+                    if (foodItem.getReplenishAutomatically()) {
+                        addToShoppingList(foodItem);
+                    }
+                })
                 .setNegativeButton("No", null)
                 .show();
     }
@@ -243,9 +250,10 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         EditText quantityEditText = dialogView.findViewById(R.id.dialogQuantityEditText);
         TextView expirationDateTextView = dialogView.findViewById(R.id.dialogExpirationDateTextView);
         Spinner categorySpinner = dialogView.findViewById(R.id.dialogCategorySpinner);
+        CheckBox replenishCheckBox = dialogView.findViewById(R.id.dialogReplenishCheckBox);
 
         // Set up category spinner
-        String[] categories = {"Dairy", "Meat", "Vegetables", "Fruits", "Snacks"};
+        String[] categories = getResources().getStringArray(R.array.categories);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(adapter);
@@ -272,19 +280,36 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Add Food Item")
                 .setView(dialogView)
-                .setPositiveButton("Add", (dialogInterface, i) -> {
-                    String name = foodNameEditText.getText().toString();
-                    int quantity = Integer.parseInt(quantityEditText.getText().toString());
-                    String expirationDate = expirationDateTextView.getText().toString();
-                    String category = categorySpinner.getSelectedItem().toString();
-
-                    // Add the item (update the backend and RecyclerView)
-                    addFoodItem(new FoodItem(name, quantity, expirationDate, category));
-                })
+                .setPositiveButton("Add", null) // Set to null initially
                 .setNegativeButton("Cancel", null)
                 .create();
 
         dialog.show();
+
+        // Override the PositiveButton to handle validation
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String name = foodNameEditText.getText().toString().trim();
+            String quantityStr = quantityEditText.getText().toString().trim();
+            String expirationDate = expirationDateTextView.getText().toString().trim();
+            String category = categorySpinner.getSelectedItem().toString();
+            boolean replenishAutomatically = replenishCheckBox.isChecked();
+
+            // Validate inputs
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Please enter the food name", Toast.LENGTH_SHORT).show();
+            } else if (quantityStr.isEmpty()) {
+                Toast.makeText(this, "Please enter the quantity", Toast.LENGTH_SHORT).show();
+            } else if (expirationDate.isEmpty()) {
+                Toast.makeText(this, "Please select an expiration date", Toast.LENGTH_SHORT).show();
+            } else if (category.isEmpty()) {
+                Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show();
+            } else {
+                // All inputs are valid; proceed with adding the item
+                int quantity = Integer.parseInt(quantityStr);
+                addFoodItem(new FoodItem(name, quantity, expirationDate, category ,replenishAutomatically));
+                dialog.dismiss(); // Close the dialog
+            }
+        });
     }
 
     private void addFoodItem(FoodItem foodItem) {
@@ -304,6 +329,29 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
 
             @Override
             public void onFailure(Call<FoodItem> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Add item to shopping list
+    private void addToShoppingList(FoodItem foodItem) {
+        ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
+        ShoppingItem shoppingItem = new ShoppingItem(foodItem.getName(),false, foodItem.getCategory());
+
+        Call<ShoppingItem> call = apiService.addShoppingItem(shoppingItem);
+        call.enqueue(new Callback<ShoppingItem>() {
+            @Override
+            public void onResponse(Call<ShoppingItem> call, Response<ShoppingItem> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(MainActivity.this, "Added to shopping list", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Failed to add to shopping list", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ShoppingItem> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

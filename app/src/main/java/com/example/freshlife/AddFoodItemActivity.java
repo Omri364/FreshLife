@@ -71,7 +71,7 @@ public class AddFoodItemActivity extends AppCompatActivity {
             String expirationDate = expirationDateTextView.getText().toString();
             String category = categorySpinner.getSelectedItem().toString();
 
-            FoodItem foodItem = new FoodItem(name, quantity, expirationDate, category);
+            FoodItem foodItem = new FoodItem(name, quantity, expirationDate, category, false);
             addFoodItem(foodItem);
         });
     }
