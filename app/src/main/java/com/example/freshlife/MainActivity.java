@@ -2,8 +2,11 @@ package com.example.freshlife;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +33,7 @@ import retrofit2.Response;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
+import com.example.freshlife.utils.DataFetcher;
 import com.example.freshlife.utils.RecyclerViewSwipeDecorator;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -46,6 +50,7 @@ import java.util.Locale;
 import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import androidx.recyclerview.widget.ItemTouchHelper;
+import android.Manifest;
 
 
 public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDeleteClickListener {
@@ -53,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
     private RecyclerView foodItemsRecyclerView;
     private FoodAdapter foodAdapter;
     private List<FoodItem> foodItems = new ArrayList<>();
+    private static final int REQUEST_NOTIFICATION_PERMISSION = 1;
 
     // Define the ActivityResultLauncher
     private final ActivityResultLauncher<Intent> addFoodItemLauncher = registerForActivityResult(
@@ -72,6 +78,15 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
     );
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Fetch items and schedule notifications
+        fetchFoodItems();
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -81,6 +96,13 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
 
         foodAdapter = new FoodAdapter(this, foodItems, this ,this::showEditFoodDialog);
         foodItemsRecyclerView.setAdapter(foodAdapter);
+
+        // Check and request POST_NOTIFICATIONS permission for Android 13 or higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_NOTIFICATION_PERMISSION);
+            }
+        }
 
         // Spinner for sorting
         Spinner sortSpinner = findViewById(R.id.sortSpinner);
@@ -187,29 +209,22 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
     }
 
     private void fetchFoodItems() {
-        ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
-        Call<List<FoodItem>> call = apiService.getFoodItems();
+        DataFetcher.fetchFoodItemsFromDatabase(this, foodItems -> {
+            // Clear and update the list
+            this.foodItems.clear();
+            this.foodItems.addAll(foodItems);
 
-        call.enqueue(new Callback<List<FoodItem>>() {
-            @Override
-            public void onResponse(Call<List<FoodItem>> call, Response<List<FoodItem>> response) {
-                if (response.isSuccessful()) {
-                    foodItems.clear();
-                    foodItems.addAll(response.body());
-                    sortByExpiration(); // apply default sorting
-                    foodAdapter.notifyDataSetChanged();
-                } else {
-                    Log.e("MainActivity", "Request failed with code: " + response.code());
-                }
-            }
+            // Apply default sorting
+            sortByExpiration();
 
-            @Override
-            public void onFailure(Call<List<FoodItem>> call, Throwable t) {
-                Log.e("MainActivity", "Failed to fetch food items", t);
-            }
+            // Notify adapter of data changes
+            foodAdapter.notifyDataSetChanged();
+
+            // Schedule notifications for fetched items
+            Log.d("MainActivity", "Scheduling notifications for fetched items.");
+            NotificationScheduler.scheduleNotifications(this, foodItems);
         });
     }
-
 
     @Override
     public void onDeleteClick(FoodItem foodItem, int position) {
