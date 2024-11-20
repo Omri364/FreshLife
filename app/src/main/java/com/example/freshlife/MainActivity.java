@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +28,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import retrofit2.Call;
@@ -61,6 +65,11 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
     private FoodAdapter foodAdapter;
     private List<FoodItem> foodItems = new ArrayList<>();
     private static final int REQUEST_NOTIFICATION_PERMISSION = 1;
+    private List<String> locations = new ArrayList<>(Arrays.asList("All", "Unsorted", "Fridge"));
+    private String selectedLocation = "All";
+    private static final String LOCATIONS_KEY = "locations_key";
+    private SharedPreferences sharedPreferences;
+
 
     // Define the ActivityResultLauncher
     private final ActivityResultLauncher<Intent> addFoodItemLauncher = registerForActivityResult(
@@ -113,24 +122,10 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortSpinner.setAdapter(sortAdapter);
 
-        locationFilterSpinner = findViewById(R.id.locationFilterSpinner);
-        String[] locations = getResources().getStringArray(R.array.locations); // Locations array in strings.xml
-        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, locations);
-        locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        locationFilterSpinner.setAdapter(locationAdapter);
-
-        locationFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                filterAndSortFoodItems();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
-            }
-        });
-
+        sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
+        loadLocations();
+        LinearLayout locationButtonContainer = findViewById(R.id.locationButtonContainer);
+        generateLocationButtons(locationButtonContainer);
 
         // Handle sorting selection
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -320,10 +315,13 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         categorySpinner.setAdapter(adapter);
 
         // Populate location spinner
-        ArrayAdapter<CharSequence> locationAdapter = ArrayAdapter.createFromResource(
-                this, R.array.locations, android.R.layout.simple_spinner_item);
-        locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        locationSpinner.setAdapter(locationAdapter);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                locations.subList(1, locations.size()) // Exclude "All"
+        );
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        locationSpinner.setAdapter(spinnerAdapter);
 
         // Set up expiration date picker
         expirationDateTextView.setOnClickListener(v -> {
@@ -462,11 +460,16 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         categorySpinner.setSelection(getCategoryIndex(foodItem.getCategory(), categories));
 
         // Populate location spinner
-        String[] locations = getResources().getStringArray(R.array.locations);
-        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, locations);
-        locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        locationSpinner.setAdapter(locationAdapter);
-        locationSpinner.setSelection(getLocationIndex(foodItem.getLocation(), locations));
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                locations.subList(1, locations.size()) // Exclude "All"
+        );
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        locationSpinner.setAdapter(spinnerAdapter);
+
+        // Pre-select the correct location for editing
+        locationSpinner.setSelection(spinnerAdapter.getPosition(foodItem.getLocation()));
 
         // Set up expiration date picker
         expirationDateTextView.setOnClickListener(v -> {
@@ -580,16 +583,12 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
     }
 
     private void filterAndSortFoodItems() {
-        // Get the selected location from the location spinner
-        String selectedLocation = locationFilterSpinner.getSelectedItem().toString();
         List<FoodItem> filteredItems = new ArrayList<>();
 
-        // Filter items by location
+        // Filter by location
         if (selectedLocation.equals("All")) {
-            // Show all items
-            filteredItems.addAll(foodItems);
+            filteredItems.addAll(foodItems); // Show all items
         } else {
-            // Show only items matching the selected location
             for (FoodItem item : foodItems) {
                 if (item.getLocation().equalsIgnoreCase(selectedLocation)) {
                     filteredItems.add(item);
@@ -597,10 +596,8 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             }
         }
 
-        // Get the selected sorting option
+        // Apply sorting
         String selectedSortOption = sortSpinner.getSelectedItem().toString();
-
-        // Sort items based on the selected sorting option
         switch (selectedSortOption) {
             case "Sort By A-Z":
                 Collections.sort(filteredItems, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
@@ -609,8 +606,8 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                 Collections.sort(filteredItems, (o1, o2) -> o1.getCategory().compareToIgnoreCase(o2.getCategory()));
                 break;
             case "Sort By Expiration":
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Collections.sort(filteredItems, (o1, o2) -> {
+                filteredItems.sort((o1, o2) -> {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                     try {
                         Date date1 = sdf.parse(o1.getExpirationDate());
                         Date date2 = sdf.parse(o2.getExpirationDate());
@@ -621,15 +618,61 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                     }
                 });
                 break;
-            default:
-                Collections.sort(filteredItems, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
-                break;
         }
 
-        // Update the adapter with the filtered and sorted list
+        // Update the adapter
         foodAdapter.updateList(filteredItems);
     }
 
+
+    private void generateLocationButtons(LinearLayout locationButtonContainer) {
+        locationButtonContainer.removeAllViews();
+
+        for (String location : locations) {
+            Button button = new Button(this);
+            button.setText(location);
+            button.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+            button.setBackgroundResource(R.drawable.default_button_background);
+
+            // Highlight the selected button
+            if (location.equals(selectedLocation)) {
+                button.setBackgroundResource(R.drawable.selected_button_background);
+            }
+
+            button.setOnClickListener(v -> {
+                selectedLocation = location;
+
+                // Highlight the selected button and reset others
+                updateButtonStyles(locationButtonContainer);
+                filterAndSortFoodItems();
+            });
+
+            locationButtonContainer.addView(button);
+        }
+
+        // Add the edit button at the beginning
+        FloatingActionButton editButton = new FloatingActionButton(this);
+        editButton.setImageResource(R.drawable.ic_edit);
+        editButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primaryColor)));
+        editButton.setOnClickListener(v -> showEditLocationsDialog());
+
+        locationButtonContainer.addView(editButton, 0);
+    }
+
+    private void updateButtonStyles(LinearLayout locationButtonContainer) {
+        for (int i = 0; i < locationButtonContainer.getChildCount(); i++) {
+            View view = locationButtonContainer.getChildAt(i);
+            if (view instanceof Button) {
+                Button button = (Button) view;
+
+                if (button.getText().toString().equals(selectedLocation)) {
+                    button.setBackgroundResource(R.drawable.selected_button_background);
+                } else {
+                    button.setBackgroundResource(R.drawable.default_button_background);
+                }
+            }
+        }
+    }
 
 
     private int getLocationIndex(String location, String[] locations) {
@@ -639,6 +682,117 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             }
         }
         return 0; // Default to the first location
+    }
+
+    private void showEditLocationsDialog() {
+        // Inflate the custom dialog layout
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_edit_locations, null);
+
+        // Initialize the dialog elements
+        RecyclerView locationsRecyclerView = dialogView.findViewById(R.id.locationsRecyclerView);
+        EditText newLocationEditText = dialogView.findViewById(R.id.newLocationEditText);
+        Button addLocationButton = dialogView.findViewById(R.id.addLocationButton);
+
+        // RecyclerView setup for editing locations
+        locationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Initialize the LocationAdapter
+        LocationAdapter locationAdapter = new LocationAdapter(this, locations, position -> {
+            // Remove the location from the list
+            String deletedLocation = locations.get(position);
+            locations.remove(position);
+            // Notify the adapter that the data has changed
+            locationsRecyclerView.getAdapter().notifyItemRemoved(position);
+
+            // Handle items from deleted location
+            moveItemsToUnsorted(deletedLocation);
+
+            // Regenerate the location buttons dynamically
+            generateLocationButtons((LinearLayout) findViewById(R.id.locationButtonContainer));
+        });
+        // Set the adapter to the RecyclerView
+        locationsRecyclerView.setAdapter(locationAdapter);
+
+        // Add new location
+        addLocationButton.setOnClickListener(v -> {
+            String newLocation = newLocationEditText.getText().toString().trim();
+            if (!newLocation.isEmpty() && !locations.contains(newLocation)) {
+                locations.add(newLocation);
+                locationAdapter.notifyItemInserted(locations.size() - 1);
+                generateLocationButtons((LinearLayout) findViewById(R.id.locationButtonContainer));
+            }
+        });
+
+        // Show the dialog
+        new AlertDialog.Builder(this)
+                .setTitle("Edit Locations")
+                .setView(dialogView)
+                .setPositiveButton("Done", (dialog, which) -> {
+                    saveLocations(); // Save updated locations to SharedPreferences
+                })
+                .show();
+    }
+
+    /**
+     * Move items from a deleted location to "Unsorted".
+     */
+    private void moveItemsToUnsorted(String deletedLocation) {
+        ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
+
+        // Iterate through all items and update those in the deleted location
+        for (FoodItem item : foodItems) {
+            if (item.getLocation().equalsIgnoreCase(deletedLocation)) {
+                item.setLocation("Unsorted");
+
+                // Update item in backend
+                Call<FoodItem> call = apiService.updateFoodItem(item.getId(), item);
+                call.enqueue(new Callback<FoodItem>() {
+                    @Override
+                    public void onResponse(Call<FoodItem> call, Response<FoodItem> response) {
+                        if (response.isSuccessful()) {
+                            Log.d("MainActivity", "Item moved to Unsorted: " + item.getName());
+                        } else {
+                            Log.e("MainActivity", "Failed to update item: " + response.message());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<FoodItem> call, Throwable t) {
+                        Log.e("MainActivity", "Error moving item to Unsorted", t);
+                    }
+                });
+            }
+        }
+    }
+
+    // Save locations to SharedPreferences
+    private void saveLocations() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        StringBuilder locationsString = new StringBuilder();
+        for (String location : locations) {
+            locationsString.append(location).append(",");
+        }
+        // Remove the trailing comma
+        if (locationsString.length() > 0) {
+            locationsString.setLength(locationsString.length() - 1);
+        }
+        editor.putString(LOCATIONS_KEY, locationsString.toString());
+        editor.apply();
+    }
+
+    // Load locations from SharedPreferences
+    private void loadLocations() {
+        String savedLocations = sharedPreferences.getString(LOCATIONS_KEY, null);
+        locations.clear();
+        if (savedLocations != null) {
+            Collections.addAll(locations, savedLocations.split(","));
+        } else {
+            // Default locations
+            locations.add("All");
+            locations.add("Unsorted");
+            locations.add("Fridge");
+        }
     }
 }
 

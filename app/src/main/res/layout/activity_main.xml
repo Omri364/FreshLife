@@ -9,15 +9,26 @@
     android:background="@color/backgroundColor"
     tools:context=".MainActivity">
 
-    <!-- Location Spinner -->
-    <Spinner
-        android:id="@+id/locationFilterSpinner"
-        android:layout_width="wrap_content"
+    <!-- Location Buttons -->
+    <HorizontalScrollView
+        android:id="@+id/locationScrollView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        android:layout_margin="8dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/locationButtonContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical" />
+
+    </HorizontalScrollView>
 
     <!-- Sorting Spinner -->
     <Spinner
@@ -25,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        app:layout_constraintTop_toBottomOf="@id/locationFilterSpinner"
+        app:layout_constraintTop_toBottomOf="@id/locationScrollView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
