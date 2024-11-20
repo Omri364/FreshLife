@@ -45,6 +45,9 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         FoodItem foodItem = foodItemList.get(position);
         holder.foodNameTextView.setText(foodItem.getName());
 
+        // Set the quantity
+        holder.quantityTextView.setText("Qty: " + foodItem.getQuantity());
+
         // Calculate days until expiration
         String expirationInfo = calculateDaysUntilExpiration(foodItem.getExpirationDate());
         holder.expirationInfoTextView.setText(expirationInfo);
@@ -56,24 +59,36 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         // Set category icon based on category
         switch (foodItem.getCategory()) {
             case "Dairy":
-                holder.categoryIcon.setImageResource(R.drawable.ic_dairy);
-                break;
-            case "Vegetable":
-                holder.categoryIcon.setImageResource(R.drawable.ic_vegtable);
-                break;
-            case "Meat":
-                holder.categoryIcon.setImageResource(R.drawable.ic_meat);
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_dairy);
                 break;
             case "Drink":
-                holder.categoryIcon.setImageResource(R.drawable.ic_drink);
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_drink);
+                break;
+            case "Dry Food":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_dry_food);
+                break;
+            case "Fish":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_fish);
+                break;
+            case "Meat":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_meat);
+                break;
+            case "Other":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_food);
+                break;
+            case "Sauce":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_sauce);
+                break;
+            case "Vegetable":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_vegtable);
                 break;
             default:
-                holder.categoryIcon.setImageResource(R.drawable.ic_food); // Default icon
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_food); // Default icon
                 break;
         }
 
-        // Handle delete button click
-        holder.deleteButton.setOnClickListener(v -> onDeleteClickListener.onDeleteClick(foodItem, position));
+//        // Handle delete button click
+//        holder.deleteButton.setOnClickListener(v -> onDeleteClickListener.onDeleteClick(foodItem, position));
 
         // Handle item click for editing
         holder.itemView.setOnClickListener(v -> editClickListener.onEditClick(foodItem, position));
@@ -90,6 +105,7 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         TextView expirationInfoTextView;
         ImageButton deleteButton;
         ImageView categoryIcon;
+        TextView quantityTextView;
 
         public FoodViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -97,6 +113,7 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
             expirationInfoTextView = itemView.findViewById(R.id.expirationInfoTextView);
             deleteButton = itemView.findViewById(R.id.deleteButton);
             categoryIcon = itemView.findViewById(R.id.categoryIcon);
+            quantityTextView = itemView.findViewById(R.id.quantityTextView);
         }
     }
 

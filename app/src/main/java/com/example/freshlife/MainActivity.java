@@ -704,14 +704,23 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         EditText newLocationEditText = dialogView.findViewById(R.id.newLocationEditText);
         Button addLocationButton = dialogView.findViewById(R.id.addLocationButton);
 
+        // Filter out "All" and "Unsorted" from the locations
+        List<String> editableLocations = new ArrayList<>();
+        for (String location : locations) {
+            if (!location.equals("All") && !location.equals("Unsorted")) {
+                editableLocations.add(location);
+            }
+        }
+
         // RecyclerView setup for editing locations
         locationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Initialize the LocationAdapter
-        LocationAdapter locationAdapter = new LocationAdapter(this, locations, position -> {
+        // Initialize the LocationAdapter with filtered locations
+        LocationAdapter locationAdapter = new LocationAdapter(this, editableLocations, position -> {
             // Remove the location from the list
-            String deletedLocation = locations.get(position);
-            locations.remove(position);
+            String deletedLocation = editableLocations.get(position);
+            editableLocations.remove(position);
+            locations.remove(deletedLocation); // Update the main locations list
             // Notify the adapter that the data has changed
             locationsRecyclerView.getAdapter().notifyItemRemoved(position);
 
@@ -729,7 +738,8 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             String newLocation = newLocationEditText.getText().toString().trim();
             if (!newLocation.isEmpty() && !locations.contains(newLocation)) {
                 locations.add(newLocation);
-                locationAdapter.notifyItemInserted(locations.size() - 1);
+                editableLocations.add(newLocation); // Also add to the filtered list
+                locationAdapter.notifyItemInserted(editableLocations.size() - 1);
                 generateLocationButtons((LinearLayout) findViewById(R.id.locationButtonContainer));
             }
         });
@@ -743,6 +753,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                 })
                 .show();
     }
+
 
     /**
      * Move items from a deleted location to "Unsorted".

@@ -2,11 +2,13 @@
     <string name="app_name">FreshLife</string>
     <string-array name="categories">
         <item>Dairy</item>
-        <item>Vegetable</item>
-        <item>Meat</item>
-        <item>Fruit</item>
         <item>Drink</item>
+        <item>Dry Food</item>
+        <item>Fish</item>
+        <item>Meat</item>
         <item>Other</item>
+        <item>Sauce</item>
+        <item>Vegetable</item>
     </string-array>
     <string-array name="sort_options">
         <item>Sort By A-Z</item>

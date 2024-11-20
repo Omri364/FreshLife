@@ -30,12 +30,30 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         return new LocationViewHolder(view);
     }
 
+//    @Override
+//    public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
+//        String location = locations.get(position);
+//        holder.locationName.setText(location);
+//        holder.deleteButton.setOnClickListener(v -> onDeleteLocationListener.onDeleteClick(position));
+//    }
     @Override
     public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
         String location = locations.get(position);
+
+        // Set location name
         holder.locationName.setText(location);
-        holder.deleteButton.setOnClickListener(v -> onDeleteLocationListener.onDeleteClick(position));
+
+        // Disable delete button for "All" and "Unsorted"
+        if (location.equals("All") || location.equals("Unsorted")) {
+            holder.deleteButton.setVisibility(View.GONE); // Hide delete button
+        } else {
+            holder.deleteButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setOnClickListener(v -> {
+                onDeleteLocationListener.onDeleteClick(position);
+            });
+        }
     }
+
 
     @Override
     public int getItemCount() {
