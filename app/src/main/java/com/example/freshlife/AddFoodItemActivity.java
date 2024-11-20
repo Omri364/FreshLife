@@ -21,6 +21,7 @@ public class AddFoodItemActivity extends AppCompatActivity {
     private EditText nameEditText, quantityEditText;
     private TextView expirationDateTextView;
     private Spinner categorySpinner;
+    private Spinner locationSpinner;
     private Button addButton;
     private int selectedYear, selectedMonth, selectedDay;
 
@@ -33,6 +34,7 @@ public class AddFoodItemActivity extends AppCompatActivity {
         quantityEditText = findViewById(R.id.quantityEditText);
         expirationDateTextView = findViewById(R.id.expirationDateTextView);
         categorySpinner = findViewById(R.id.categorySpinner);
+//        locationSpinner = findViewById(R.id.locationSpinner);
         addButton = findViewById(R.id.addButton);
 
         // Populate category spinner
@@ -71,7 +73,7 @@ public class AddFoodItemActivity extends AppCompatActivity {
             String expirationDate = expirationDateTextView.getText().toString();
             String category = categorySpinner.getSelectedItem().toString();
 
-            FoodItem foodItem = new FoodItem(name, quantity, expirationDate, category, false);
+            FoodItem foodItem = new FoodItem(name, quantity, expirationDate, category, false, "Unsorted");
             addFoodItem(foodItem);
         });
     }

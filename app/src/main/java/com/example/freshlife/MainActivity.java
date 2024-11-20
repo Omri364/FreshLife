@@ -56,6 +56,8 @@ import android.Manifest;
 public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDeleteClickListener {
 
     private RecyclerView foodItemsRecyclerView;
+    private Spinner locationFilterSpinner;
+    private Spinner sortSpinner;
     private FoodAdapter foodAdapter;
     private List<FoodItem> foodItems = new ArrayList<>();
     private static final int REQUEST_NOTIFICATION_PERMISSION = 1;
@@ -105,31 +107,36 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         }
 
         // Spinner for sorting
-        Spinner sortSpinner = findViewById(R.id.sortSpinner);
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
-                this,
-                R.array.sort_options, // String array defined in res/values/strings.xml
-                android.R.layout.simple_spinner_item
-        );
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sortSpinner.setAdapter(spinnerAdapter);
+        sortSpinner = findViewById(R.id.sortSpinner);
+        String[] sortOptions = getResources().getStringArray(R.array.sort_options); // Sorting options array in strings.xml
+        ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, sortOptions);
+        sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortSpinner.setAdapter(sortAdapter);
+
+        locationFilterSpinner = findViewById(R.id.locationFilterSpinner);
+        String[] locations = getResources().getStringArray(R.array.locations); // Locations array in strings.xml
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, locations);
+        locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        locationFilterSpinner.setAdapter(locationAdapter);
+
+        locationFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                filterAndSortFoodItems();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
+
 
         // Handle sorting selection
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0: // Alphabetical
-                        sortAlphabetically();
-                        break;
-                    case 1: // By Category
-                        sortByCategory();
-                        break;
-                    case 2: // By Expiration Date
-                        sortByExpiration();
-                        break;
-                }
-                foodAdapter.notifyDataSetChanged(); // Refresh RecyclerView
+                filterAndSortFoodItems();
             }
 
             @Override
@@ -214,8 +221,11 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             this.foodItems.clear();
             this.foodItems.addAll(foodItems);
 
-            // Apply default sorting
-            sortByExpiration();
+//            // Apply default sorting
+//            sortByExpiration();
+
+            // Apply filtering and sorting after fetching
+            filterAndSortFoodItems();
 
             // Notify adapter of data changes
             foodAdapter.notifyDataSetChanged();
@@ -300,6 +310,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         EditText quantityEditText = dialogView.findViewById(R.id.dialogQuantityEditText);
         TextView expirationDateTextView = dialogView.findViewById(R.id.dialogExpirationDateTextView);
         Spinner categorySpinner = dialogView.findViewById(R.id.dialogCategorySpinner);
+        Spinner locationSpinner = dialogView.findViewById(R.id.dialogLocationSpinner);
         CheckBox replenishCheckBox = dialogView.findViewById(R.id.dialogReplenishCheckBox);
 
         // Set up category spinner
@@ -307,6 +318,12 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(adapter);
+
+        // Populate location spinner
+        ArrayAdapter<CharSequence> locationAdapter = ArrayAdapter.createFromResource(
+                this, R.array.locations, android.R.layout.simple_spinner_item);
+        locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        locationSpinner.setAdapter(locationAdapter);
 
         // Set up expiration date picker
         expirationDateTextView.setOnClickListener(v -> {
@@ -342,6 +359,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             String quantityStr = quantityEditText.getText().toString().trim();
             String expirationDate = expirationDateTextView.getText().toString().trim();
             String category = categorySpinner.getSelectedItem().toString();
+            String location = locationSpinner.getSelectedItem().toString();
             boolean replenishAutomatically = replenishCheckBox.isChecked();
 
             // Validate inputs
@@ -356,7 +374,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             } else {
                 // All inputs are valid; proceed with adding the item
                 int quantity = Integer.parseInt(quantityStr);
-                addFoodItem(new FoodItem(name, quantity, expirationDate, category ,replenishAutomatically));
+                addFoodItem(new FoodItem(name, quantity, expirationDate, category ,replenishAutomatically, location));
                 dialog.dismiss(); // Close the dialog
             }
         });
@@ -370,8 +388,16 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             @Override
             public void onResponse(Call<FoodItem> call, Response<FoodItem> response) {
                 if (response.isSuccessful()) {
-                    foodItems.add(response.body());
-                    foodAdapter.notifyItemInserted(foodItems.size() - 1);
+                    FoodItem addedItem = response.body();
+                    if (addedItem != null) {
+                        // Add the new item to the current food items list
+                        foodItems.add(addedItem);
+                        // Filter and sort the list based on current location and sorting options
+                        filterAndSortFoodItems();
+                        // Notify the adapter to update the RecyclerView
+                        foodAdapter.notifyDataSetChanged();
+                    }
+                    Toast.makeText(MainActivity.this, "Item added successfully", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to add item", Toast.LENGTH_SHORT).show();
                 }
@@ -383,6 +409,8 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             }
         });
     }
+
+
 
     // Add item to shopping list
     private void addToShoppingList(FoodItem foodItem) {
@@ -417,6 +445,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         EditText quantityEditText = dialogView.findViewById(R.id.dialogQuantityEditText);
         TextView expirationDateTextView = dialogView.findViewById(R.id.dialogExpirationDateTextView);
         Spinner categorySpinner = dialogView.findViewById(R.id.dialogCategorySpinner);
+        Spinner locationSpinner = dialogView.findViewById(R.id.dialogLocationSpinner);
         CheckBox replenishCheckBox = dialogView.findViewById(R.id.dialogReplenishCheckBox);
 
         // Populate the fields with existing data
@@ -431,6 +460,13 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(adapter);
         categorySpinner.setSelection(getCategoryIndex(foodItem.getCategory(), categories));
+
+        // Populate location spinner
+        String[] locations = getResources().getStringArray(R.array.locations);
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, locations);
+        locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        locationSpinner.setAdapter(locationAdapter);
+        locationSpinner.setSelection(getLocationIndex(foodItem.getLocation(), locations));
 
         // Set up expiration date picker
         expirationDateTextView.setOnClickListener(v -> {
@@ -466,6 +502,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             String quantityStr = quantityEditText.getText().toString().trim();
             String expirationDate = expirationDateTextView.getText().toString().trim();
             String category = categorySpinner.getSelectedItem().toString();
+            String location = locationSpinner.getSelectedItem().toString();
             boolean replenishAutomatically = replenishCheckBox.isChecked();
 
             // Validate inputs
@@ -483,6 +520,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                 foodItem.setQuantity(quantity);
                 foodItem.setExpirationDate(expirationDate);
                 foodItem.setCategory(category);
+                foodItem.setLocation(location);
                 foodItem.setReplenishAutomatically(replenishAutomatically);
 
                 updateFoodItem(foodItem, position);
@@ -501,6 +539,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             public void onResponse(Call<FoodItem> call, Response<FoodItem> response) {
                 if (response.isSuccessful()) {
                     foodItems.set(position, foodItem);
+                    filterAndSortFoodItems(); // Update view
                     foodAdapter.notifyItemChanged(position);
                     Toast.makeText(MainActivity.this, "Item updated", Toast.LENGTH_SHORT).show();
                 } else {
@@ -523,6 +562,83 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             }
         }
         return 0; // Default to the first category
+    }
+
+    private void filterByLocation(String location) {
+        List<FoodItem> filteredItems;
+        if (location.equals("All Locations")) {
+            filteredItems = new ArrayList<>(foodItems);
+        } else {
+            filteredItems = new ArrayList<>();
+            for (FoodItem item : foodItems) {
+                if (item.getLocation().equals(location)) {
+                    filteredItems.add(item);
+                }
+            }
+        }
+        foodAdapter.updateList(filteredItems);
+    }
+
+    private void filterAndSortFoodItems() {
+        // Get the selected location from the location spinner
+        String selectedLocation = locationFilterSpinner.getSelectedItem().toString();
+        List<FoodItem> filteredItems = new ArrayList<>();
+
+        // Filter items by location
+        if (selectedLocation.equals("All")) {
+            // Show all items
+            filteredItems.addAll(foodItems);
+        } else {
+            // Show only items matching the selected location
+            for (FoodItem item : foodItems) {
+                if (item.getLocation().equalsIgnoreCase(selectedLocation)) {
+                    filteredItems.add(item);
+                }
+            }
+        }
+
+        // Get the selected sorting option
+        String selectedSortOption = sortSpinner.getSelectedItem().toString();
+
+        // Sort items based on the selected sorting option
+        switch (selectedSortOption) {
+            case "Sort By A-Z":
+                Collections.sort(filteredItems, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
+                break;
+            case "Sort By Category":
+                Collections.sort(filteredItems, (o1, o2) -> o1.getCategory().compareToIgnoreCase(o2.getCategory()));
+                break;
+            case "Sort By Expiration":
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Collections.sort(filteredItems, (o1, o2) -> {
+                    try {
+                        Date date1 = sdf.parse(o1.getExpirationDate());
+                        Date date2 = sdf.parse(o2.getExpirationDate());
+                        return date1.compareTo(date2);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        return 0;
+                    }
+                });
+                break;
+            default:
+                Collections.sort(filteredItems, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
+                break;
+        }
+
+        // Update the adapter with the filtered and sorted list
+        foodAdapter.updateList(filteredItems);
+    }
+
+
+
+    private int getLocationIndex(String location, String[] locations) {
+        for (int i = 0; i < locations.length; i++) {
+            if (locations[i].equalsIgnoreCase(location)) {
+                return i;
+            }
+        }
+        return 0; // Default to the first location
     }
 }
 

@@ -13,4 +13,12 @@
         <item>Sort By Category</item>
         <item>Sort By Expiration</item>
     </string-array>
+    <string-array name="locations">
+        <item>All</item>
+        <item>Fridge</item>
+        <item>Pantry</item>
+        <item>Freezer</item>
+        <item>Unsorted</item>
+    </string-array>
+
 </resources>

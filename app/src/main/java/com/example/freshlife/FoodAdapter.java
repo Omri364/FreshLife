@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -111,10 +113,21 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     private String calculateDaysUntilExpiration(String expirationDate) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try {
+            // Parse the expiration date
             Date expiry = sdf.parse(expirationDate);
-            Date today = new Date();
+
+            // Get today's date without time (to only compare dates)
+            Calendar todayCal = Calendar.getInstance();
+            todayCal.set(Calendar.HOUR_OF_DAY, 0);
+            todayCal.set(Calendar.MINUTE, 0);
+            todayCal.set(Calendar.SECOND, 0);
+            todayCal.set(Calendar.MILLISECOND, 0);
+            Date today = todayCal.getTime();
+
+            // Calculate the difference in days
             long diff = expiry.getTime() - today.getTime();
-            long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+            long days = diff / (24 * 60 * 60 * 1000); // Convert milliseconds to days
+
             if (days > 0) {
                 return "Expires in " + days + " days";
             } else if (days == 0) {
@@ -150,5 +163,11 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
             e.printStackTrace();
             return ContextCompat.getColor(context, R.color.white); // Default color
         }
+    }
+
+    // Updates the food item list and refreshes the RecyclerView
+    public void updateList(List<FoodItem> newFoodItemList) {
+        this.foodItemList = new ArrayList<>(newFoodItemList);
+        notifyDataSetChanged();
     }
 }
