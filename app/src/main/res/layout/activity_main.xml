@@ -50,6 +50,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- TextView for "No items to show" -->
+    <TextView
+        android:id="@+id/emptyListTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No items to show"
+        android:textSize="18sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/sortSpinner"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addFoodButton"
         android:layout_width="wrap_content"

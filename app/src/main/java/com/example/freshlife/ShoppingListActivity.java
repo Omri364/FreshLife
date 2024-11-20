@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -110,6 +111,15 @@ public class ShoppingListActivity extends AppCompatActivity {
                     shoppingItems.clear();
                     shoppingItems.addAll(response.body());
                     adapter.notifyDataSetChanged();
+                    // Update visibility of RecyclerView and TextView
+                    TextView emptyShoppingListTextView = findViewById(R.id.emptyShoppingListTextView);
+                    if (shoppingItems.isEmpty()) {
+                        emptyShoppingListTextView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    } else {
+                        emptyShoppingListTextView.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
                 } else {
                     Log.e("ShoppingListActivity", "Request failed with code: " + response.code());
                 }
@@ -133,6 +143,17 @@ public class ShoppingListActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     shoppingItems.add(response.body());
                     adapter.notifyItemInserted(shoppingItems.size() - 1);
+
+                    // Update visibility of RecyclerView and TextView
+                    TextView emptyShoppingListTextView = findViewById(R.id.emptyShoppingListTextView);
+                    if (shoppingItems.isEmpty()) {
+                        emptyShoppingListTextView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    } else {
+                        emptyShoppingListTextView.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+
                     Toast.makeText(ShoppingListActivity.this, "Product added", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(ShoppingListActivity.this, "Failed to add product", Toast.LENGTH_SHORT).show();
@@ -159,6 +180,18 @@ public class ShoppingListActivity extends AppCompatActivity {
                     // Remove the item from the list and notify the adapter
                     shoppingItems.remove(position);
                     adapter.notifyItemRemoved(position);
+
+                    // TODO: this code repeats, move to function
+                    // Update visibility of RecyclerView and TextView
+                    TextView emptyShoppingListTextView = findViewById(R.id.emptyShoppingListTextView);
+                    if (shoppingItems.isEmpty()) {
+                        emptyShoppingListTextView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    } else {
+                        emptyShoppingListTextView.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+
                     Toast.makeText(ShoppingListActivity.this, "Item deleted", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(ShoppingListActivity.this, "Failed to delete item", Toast.LENGTH_SHORT).show();

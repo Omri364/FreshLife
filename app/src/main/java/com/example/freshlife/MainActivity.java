@@ -622,6 +622,16 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
 
         // Update the adapter
         foodAdapter.updateList(filteredItems);
+
+        // Toggle visibility of the "No items to show" message
+        TextView emptyListTextView = findViewById(R.id.emptyListTextView);
+        if (filteredItems.isEmpty()) {
+            emptyListTextView.setVisibility(View.VISIBLE);
+            foodItemsRecyclerView.setVisibility(View.GONE);
+        } else {
+            emptyListTextView.setVisibility(View.GONE);
+            foodItemsRecyclerView.setVisibility(View.VISIBLE);
+        }
     }
 
 

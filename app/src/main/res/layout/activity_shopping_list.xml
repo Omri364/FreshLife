@@ -20,6 +20,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- TextView for "No items to show" -->
+    <TextView
+        android:id="@+id/emptyShoppingListTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No items to show"
+        android:textSize="18sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone" />
+
     <!-- Floating Action Button to add a new item -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addButton"

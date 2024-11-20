@@ -8,6 +8,16 @@
     android:padding="8dp"
     android:gravity="center_vertical">
 
+    <!-- Delete Button -->
+    <ImageButton
+        android:id="@+id/deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackground"
+        android:src="@drawable/baseline_close_24"
+        android:contentDescription="Delete Location"
+        app:tint="@android:color/darker_gray" />
+
     <!-- Location Name -->
     <TextView
         android:id="@+id/locationName"
@@ -17,14 +27,4 @@
         android:text="Location Name"
         android:textSize="16sp"
         android:textColor="@android:color/black" />
-
-    <!-- Delete Button -->
-    <ImageButton
-        android:id="@+id/deleteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?android:selectableItemBackground"
-        android:src="@android:drawable/ic_menu_delete"
-        android:contentDescription="Delete Location"
-        app:tint="@android:color/darker_gray" />
 </LinearLayout>
