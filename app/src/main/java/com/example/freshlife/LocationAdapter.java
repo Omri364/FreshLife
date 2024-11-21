@@ -30,12 +30,6 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         return new LocationViewHolder(view);
     }
 
-//    @Override
-//    public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
-//        String location = locations.get(position);
-//        holder.locationName.setText(location);
-//        holder.deleteButton.setOnClickListener(v -> onDeleteLocationListener.onDeleteClick(position));
-//    }
     @Override
     public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
         String location = locations.get(position);

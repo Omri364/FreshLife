@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -215,9 +216,6 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             // Clear and update the list
             this.foodItems.clear();
             this.foodItems.addAll(foodItems);
-
-//            // Apply default sorting
-//            sortByExpiration();
 
             // Apply filtering and sorting after fetching
             filterAndSortFoodItems();
@@ -638,6 +636,23 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
     private void generateLocationButtons(LinearLayout locationButtonContainer) {
         locationButtonContainer.removeAllViews();
 
+        // Add the edit button at the beginning
+        FloatingActionButton editButton = new FloatingActionButton(this);
+        editButton.setImageResource(R.drawable.ic_edit);
+        editButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.editLocationButtonBackground)));
+        editButton.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_IN);
+        editButton.setSize(FloatingActionButton.SIZE_MINI); // Smaller size for better alignment
+        editButton.setOnClickListener(v -> showEditLocationsDialog());
+
+        // Create a layout for proper padding/margin for the edit button
+        LinearLayout.LayoutParams editButtonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        editButtonParams.setMargins(8, 0, 16, 0); // Add some spacing
+        locationButtonContainer.addView(editButton, editButtonParams);
+
+        // Add location buttons
         for (String location : locations) {
             Button button = new Button(this);
             button.setText(location);
@@ -657,17 +672,16 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                 filterAndSortFoodItems();
             });
 
-            locationButtonContainer.addView(button);
+            // Add proper spacing for location buttons
+            LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            buttonParams.setMargins(16, 0, 16, 0); // Add space between buttons
+            locationButtonContainer.addView(button, buttonParams);
         }
-
-        // Add the edit button at the beginning
-        FloatingActionButton editButton = new FloatingActionButton(this);
-        editButton.setImageResource(R.drawable.ic_edit);
-        editButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primaryColor)));
-        editButton.setOnClickListener(v -> showEditLocationsDialog());
-
-        locationButtonContainer.addView(editButton, 0);
     }
+
 
     private void updateButtonStyles(LinearLayout locationButtonContainer) {
         for (int i = 0; i < locationButtonContainer.getChildCount(); i++) {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primaryColor">#4CAF50</color> <!-- Green for primary color -->
-    <color name="primaryDarkColor">#388E3C</color> <!-- Darker green -->
+    <color name="primaryColor">#184e77</color> <!-- Green for primary color -->
+    <color name="primaryDarkColor">#003049</color> <!-- Darker green -->
     <color name="accentColor">#1E3095</color> <!-- Orange for accent -->
     <color name="backgroundColor">#F5F5F5</color> <!-- Light gray for background -->
     <color name="textColor">#212121</color> <!-- Dark gray for text -->
@@ -11,4 +11,11 @@
     <color name="light_red">#FFCDD2</color> <!-- Light red for expired items -->
     <color name="light_yellow">#FFF9C4</color> <!-- Light yellow for items expiring soon -->
     <color name="deleteBackground">#FFCDD2</color>
+    <color name="editLocationButtonBackground">#52b69a</color>
+    <color name="buttonLocationBackground">#E0E0E0</color>
+    <color name="selectedButtonLocationBackground">#90CAF9</color>
+    <color name="addButton">#52b69a</color>
+
+    <color name="addButton2">#52b69a</color>
+    <color name="primaryColor2">#184e77</color>
 </resources>
