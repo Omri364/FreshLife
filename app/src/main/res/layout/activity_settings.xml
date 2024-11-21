@@ -7,57 +7,184 @@
     android:layout_height="match_parent"
     tools:context=".SettingsActivity">
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:background="@color/backgroundColor">
 
-        <!-- Days Before Notification Setting -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notify me X days before expiration"
-            android:textSize="16sp" />
-
-        <SeekBar
-            android:id="@+id/notificationDaysSeekBar"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="10" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/notificationDaysText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Days: 3" />
 
-        <!-- Notification Time Setting -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notification Time"
-            android:textSize="16sp"
-            android:layout_marginTop="16dp" />
 
-        <TimePicker
-            android:id="@+id/notificationTimePicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/notificationDaysText"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            <!-- Notification Settings Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
-        <!-- Save Button -->
-        <Button
-            android:id="@+id/saveSettingsButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Save Settings"
-            android:layout_marginTop="16dp" />
-    </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Notification Settings"
+                        android:textSize="18sp"
+                        android:textColor="@color/textColor"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Days to Notify Before Expiration -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Days to notify before expiration"
+                            android:textSize="16sp"
+                            android:textColor="@color/secondaryTextColor"
+                            android:layout_weight="1" />
+
+                        <EditText
+                            android:id="@+id/notificationDaysInput"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:hint="3"
+                            android:backgroundTint="@color/secondaryTextColor"
+                            android:maxLength="2"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp" />
+                    </LinearLayout>
+
+                    <!-- Notification Time -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Notification time"
+                            android:textSize="16sp"
+                            android:textColor="@color/secondaryTextColor"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:id="@+id/notificationTimeTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="09:00"
+                            android:textSize="16sp"
+                            android:textColor="@color/primaryColor"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- App Settings Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="App Settings"
+                        android:textSize="18sp"
+                        android:textColor="@color/textColor"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Dark Mode Toggle -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Enable Dark Mode"
+                            android:textSize="16sp"
+                            android:textColor="@color/secondaryTextColor"
+                            android:layout_weight="1" />
+
+                        <Switch
+                            android:id="@+id/darkModeSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <!-- Default Sorting -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Default sorting method"
+                            android:textSize="16sp"
+                            android:textColor="@color/secondaryTextColor"
+                            android:layout_weight="1" />
+
+                        <Spinner
+                            android:id="@+id/sortingSpinner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Save Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saveSettingsButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/primaryColor"
+                android:text="Save Settings"
+                android:textColor="@color/white" />
+        </LinearLayout>
+    </ScrollView>
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

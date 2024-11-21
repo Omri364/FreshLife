@@ -255,8 +255,12 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    foodItems.remove(position);
-                    foodAdapter.notifyItemRemoved(position);
+                    // Remove the item from the main list
+                    foodItems.removeIf(item -> item.getId().equals(foodItem.getId()));
+
+                    // Apply filtering and sorting again
+                    filterAndSortFoodItems();
+
                     Toast.makeText(MainActivity.this, "Item deleted", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to delete item: " + response.message(), Toast.LENGTH_SHORT).show();
@@ -269,6 +273,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             }
         });
     }
+
 
     // Sorting methods
     private void sortAlphabetically() {
