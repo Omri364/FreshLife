@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -60,6 +61,41 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
         // Handle item click for editing
         holder.itemView.setOnClickListener(v -> editClickListener.onEditClick(item, position));
+
+        // Set quantity
+        holder.quantityTextView.setText("Qty: " + item.getQuantity());
+
+        //TODO: put in a helper class
+        // Set category icon based on category
+        switch (item.getCategory()) {
+            case "Dairy":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_dairy);
+                break;
+            case "Drink":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_drink);
+                break;
+            case "Dry Food":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_dry_food);
+                break;
+            case "Fish":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_fish);
+                break;
+            case "Meat":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_meat);
+                break;
+            case "Other":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_food);
+                break;
+            case "Sauce":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_sauce);
+                break;
+            case "Vegetable":
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_vegtable);
+                break;
+            default:
+                holder.categoryIcon.setImageResource(R.drawable.ic_category_food); // Default icon
+                break;
+        }
     }
 
     @Override
@@ -88,12 +124,16 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         TextView itemName;
         RadioButton radioButton;
         View itemContainer;
+        TextView quantityTextView;
+        ImageView categoryIcon;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemName = itemView.findViewById(R.id.itemName);
             radioButton = itemView.findViewById(R.id.itemCheckBox);
             itemContainer = itemView.findViewById(R.id.itemContainer);
+            quantityTextView = itemView.findViewById(R.id.shoppingQuantityTextView);
+            categoryIcon = itemView.findViewById(R.id.shoppingCategoryIcon);
         }
     }
 

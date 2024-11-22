@@ -30,11 +30,38 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="16sp"
+            android:text="Item Name"
+            android:textColor="@color/textColor"
             android:layout_marginStart="8dp"
             app:layout_constraintStart_toEndOf="@id/itemCheckBox"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toStartOf="@id/shoppingQuantityTextView" />
 
+        <!-- Quantity -->
+        <TextView
+            android:id="@+id/shoppingQuantityTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Qty: 1"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/secondaryTextColor"
+            app:layout_constraintEnd_toStartOf="@id/shoppingCategoryIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="50dp" />
+
+        <!-- Category Icon -->
+        <ImageView
+            android:id="@+id/shoppingCategoryIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="Category Icon"
+            android:src="@drawable/ic_category_placeholder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="8dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

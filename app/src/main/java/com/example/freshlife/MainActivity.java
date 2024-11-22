@@ -416,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
     // Add item to shopping list
     private void addToShoppingList(FoodItem foodItem) {
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
-        ShoppingItem shoppingItem = new ShoppingItem(foodItem.getName(),false, foodItem.getCategory());
+        ShoppingItem shoppingItem = new ShoppingItem(foodItem.getName(), false, foodItem.getCategory(), foodItem.getQuantity());
 
         Call<ShoppingItem> call = apiService.addShoppingItem(shoppingItem);
         call.enqueue(new Callback<ShoppingItem>() {
@@ -424,6 +424,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             public void onResponse(Call<ShoppingItem> call, Response<ShoppingItem> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(MainActivity.this, "Added to shopping list", Toast.LENGTH_SHORT).show();
+//                    fetchShoppingItems(); // Refresh the shopping list
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to add to shopping list", Toast.LENGTH_SHORT).show();
                 }
@@ -435,6 +436,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             }
         });
     }
+
 
     // Show edit food item dialog
     private void showEditFoodDialog(FoodItem foodItem, int position) {

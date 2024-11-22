@@ -10,11 +10,13 @@ public class ShoppingItem implements Serializable {
     private String name;
     private boolean isChecked;
     private String category;
+    private int quantity;
 
-    public ShoppingItem(String name, boolean isChecked, String category) {
+    public ShoppingItem(String name, boolean isChecked, String category, int quantity) {
         this.name = name;
         this.isChecked = isChecked;
         this.category = category;
+        this.quantity = quantity;
     }
 
     public String getId() {
@@ -48,4 +50,6 @@ public class ShoppingItem implements Serializable {
     public void setCategory(String category) {
         this.category = category;
     }
+    public int getQuantity() {return this.quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 }
