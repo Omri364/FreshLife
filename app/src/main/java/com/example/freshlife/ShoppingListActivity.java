@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -23,6 +24,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -36,6 +38,7 @@ public class ShoppingListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ShoppingListAdapter adapter;
     private List<ShoppingItem> shoppingItems = new ArrayList<>();
+    private Spinner sortSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +71,9 @@ public class ShoppingListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ShoppingListAdapter(this, shoppingItems, this::showEditShoppingDialog);
         recyclerView.setAdapter(adapter);
+
+        sortSpinner = findViewById(R.id.sortSpinner);
+        setupSortSpinner();
 
         FloatingActionButton addButton = findViewById(R.id.addButton);
         addButton.setOnClickListener(v -> showAddProductDialog());
@@ -331,5 +337,37 @@ public class ShoppingListActivity extends AppCompatActivity {
             }
         }
         return 0; // Default to the first category
+    }
+
+    private void setupSortSpinner() {
+        String[] sortOptions = {"Sort by A-Z", "Sort by Category"};
+        ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, sortOptions);
+        sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortSpinner.setAdapter(sortAdapter);
+
+        sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                sortShoppingItems(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
+    }
+
+    private void sortShoppingItems(int sortOption) {
+        switch (sortOption) {
+            case 0: // Sort by A-Z
+                shoppingItems.sort(Comparator.comparing(ShoppingItem::getName, String.CASE_INSENSITIVE_ORDER));
+                break;
+            case 1: // Sort by Category
+                shoppingItems.sort(Comparator.comparing(ShoppingItem::getCategory, String.CASE_INSENSITIVE_ORDER));
+                break;
+        }
+
+        adapter.notifyDataSetChanged();
     }
 }
