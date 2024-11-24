@@ -168,17 +168,17 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
 
             if (days < 0) {
                 // Expired (light red)
-                return ContextCompat.getColor(context, R.color.light_red);
+                return ContextCompat.getColor(context, R.color.expiredItem);
             } else if (days <= 3) {
                 // Expiring in 3 days (light yellow)
-                return ContextCompat.getColor(context, R.color.light_yellow);
+                return ContextCompat.getColor(context, R.color.soonExpiringItem);
             } else {
                 // Default background (white)
-                return ContextCompat.getColor(context, R.color.white);
+                return ContextCompat.getColor(context, R.color.defaultItem);
             }
         } catch (ParseException e) {
             e.printStackTrace();
-            return ContextCompat.getColor(context, R.color.white); // Default color
+            return ContextCompat.getColor(context, R.color.defaultItem); // Default color
         }
     }
 

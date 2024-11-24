@@ -1,21 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primaryColor">#184e77</color> <!-- Green for primary color -->
-    <color name="primaryDarkColor">#003049</color> <!-- Darker green -->
-    <color name="accentColor">#1E3095</color> <!-- Orange for accent -->
-    <color name="backgroundColor">#F5F5F5</color> <!-- Light gray for background -->
-    <color name="textColor">#212121</color> <!-- Dark gray for text -->
-    <color name="secondaryTextColor">#757575</color> <!-- Lighter gray for secondary text -->
-    <color name="white">#FFFFFF</color>
-    <color name="light_grey">#F5F5F5</color>
-    <color name="light_red">#FFCDD2</color> <!-- Light red for expired items -->
-    <color name="light_yellow">#FFF9C4</color> <!-- Light yellow for items expiring soon -->
-    <color name="deleteBackground">#FFCDD2</color>
+    <!-- General colors -->
+    <color name="backgroundColor">#F5F5F5</color>
+    <color name="textColor">#212121</color>
+    <color name="secondaryTextColor">#757575</color>
+    <color name="primaryColor">#1B2939</color>
+    <color name="accentColor">#52b69a</color>
+
+    <color name="colorAccent">#47ED0B</color>
+
+    <color name="testColor">#47ED0B</color>
+
+<!--    <color name="primaryDarkColor">#003049</color>-->
+
+<!--    <color name="white">#FFFFFF</color>-->
+
+    <!-- Items list -->
+    <color name="itemTextColor">#212121</color>
+    <color name="itemSecondaryTextColor">#757575</color>
+    <color name="defaultItem">#FFFFFF</color>
+    <color name="checkedItem">#F5F5F5</color>
+    <color name="expiredItem">#FFCDD2</color>
+    <color name="soonExpiringItem">#FFF9C4</color>
+    <color name="deleteBackground">#FF9800</color>
+    <color name="deleteIcon">#F5F5F5</color>
+    <color name="addButton">#52b69a</color>
+    <color name="addButtonIcon">#FFFFFF</color>
+    <color name="itemCheckbox">#52b69a</color>
+    <color name="dialogSelectExpirationDate">#FBF9F9</color>
+
+
+    <!-- Storage locations buttons -->
     <color name="editLocationButtonBackground">#52b69a</color>
     <color name="buttonLocationBackground">#E0E0E0</color>
-    <color name="selectedButtonLocationBackground">#90CAF9</color>
-    <color name="addButton">#52b69a</color>
+    <color name="locationButtonText">#212121</color>
+    <color name="selectedButtonLocationBackground">#B1B1B1</color>
+    <color name="editLocationsButton">#52b69a</color>
+    <color name="editLocationsIcon">#FFFFFF</color>
+    <color name="addLocationButton">#52b69a</color>
+    <color name="addLocationButtonText">#FFFFFF</color>
 
+    <!-- Navigation menu -->
+    <color name="navigationBarBackground">#1B2939</color>
+    <color name="navigationBarText">#DAD8D8</color>
+    <color name="navigationBarTextSelected">#90CAF9</color>
+
+    <!-- Settings -->
+    <color name="settingsColor">#52b69a</color>
+    <color name="saveSettingsButton">#52b69a</color>
+    <color name="saveSettingsButtonText">#FFFFFF</color>
+
+    <!-- Backups -->
+    <color name="navigationBarBackground2">#184e77</color>
     <color name="addButton2">#52b69a</color>
     <color name="primaryColor2">#184e77</color>
 </resources>

@@ -2,10 +2,9 @@
     <!-- Base application theme. -->
     <style name="Theme.FreshLife" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorPrimaryVariant">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/accentColor</item>
         <item name="android:statusBarColor">@color/backgroundColor</item> <!-- Change status bar color -->
-        <item name="android:windowLightStatusBar">true</item> <!-- For light text/icons -->
+        <item name="android:windowLightStatusBar">false</item> <!-- For light text/icons -->
         <item name="bottomNavigationStyle">@style/Widget.MaterialComponents.BottomNavigationView</item>
     </style>
 </resources>

@@ -19,8 +19,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-
-
             <!-- Notification Settings Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -65,7 +63,9 @@
                             android:layout_height="wrap_content"
                             android:inputType="number"
                             android:hint="3"
-                            android:backgroundTint="@color/secondaryTextColor"
+                            android:backgroundTint="@color/settingsColor"
+                            android:textColor="@color/settingsColor"
+                            android:textColorHint="@color/settingsColor"
                             android:maxLength="2"
                             android:layout_marginStart="16dp"
                             android:layout_marginEnd="16dp" />
@@ -93,7 +93,7 @@
                             android:layout_height="wrap_content"
                             android:text="09:00"
                             android:textSize="16sp"
-                            android:textColor="@color/primaryColor"
+                            android:textColor="@color/settingsColor"
                             android:clickable="true"
                             android:focusable="true"
                             android:layout_marginStart="16dp"
@@ -160,9 +160,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:backgroundTint="@color/primaryColor"
+                android:backgroundTint="@color/saveSettingsButton"
                 android:text="Save Settings"
-                android:textColor="@color/white" />
+                android:textColor="@color/saveSettingsButtonText" />
         </LinearLayout>
     </ScrollView>
 
@@ -173,7 +173,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         app:menu="@menu/bottom_nav_menu"
-        android:background="@color/primaryColor"
+        android:background="@color/navigationBarBackground"
         app:itemIconTint="@color/selector_navigation_color"
         app:itemTextColor="@color/selector_navigation_color"
         app:layout_constraintBottom_toBottomOf="parent"

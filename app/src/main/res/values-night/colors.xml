@@ -1,9 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<!--    <color name="backgroundColor">#121212</color>-->
+<!--    <color name="textColor">#212121</color>-->
+<!--    <color name="secondaryTextColor">#B0B0B0</color>-->
+<!--    <color name="primaryColor">#1B2939</color>-->
+<!--    <color name="accentColor">#03DAC5</color>-->
+
+    <!-- General colors -->
     <color name="backgroundColor">#121212</color>
-    <color name="textColor">#FFFFFF</color>
-    <color name="secondaryTextColor">#B0B0B0</color>
-    <color name="primaryColor">#BB86FC</color>
-    <color name="primaryDarkColor">#3700B3</color>
+    <color name="textColor">#F1ECEC</color>
+    <color name="secondaryTextColor">#CFCCCC</color>
+    <color name="primaryColor">#1B2939</color>
     <color name="accentColor">#03DAC5</color>
+
+
+    <color name="testColor">#47ED0B</color>
+
+
+
+    <!-- Items list -->
+    <color name="itemTextColor">#F1ECEC</color>
+    <color name="itemSecondaryTextColor">#E3DEDE</color>
+    <color name="defaultItem">#1B2939</color>
+    <color name="checkedItem">#111B25</color>
+    <color name="expiredItem">#F85D6C</color>
+    <color name="soonExpiringItem">#CCBB25</color>
+    <color name="deleteBackground">#FF9800</color>
+    <color name="deleteIcon">#F5F5F5</color>
+    <color name="addButton">#52b69a</color>
+    <color name="addButtonIcon">#FFFFFF</color>
+    <color name="itemCheckbox">#52b69a</color>
+    <color name="dialogSelectExpirationDate">#E1DFDF</color>
+
+    <!-- Storage locations buttons -->
+    <color name="editLocationButtonBackground">#52b69a</color>
+    <color name="buttonLocationBackground">#3665B3</color>
+    <color name="selectedButtonLocationBackground">#2A4F8E</color>
+    <color name="locationButtonText">#F1ECEC</color>
+    <color name="editLocationsButton">#52b69a</color>
+    <color name="editLocationsIcon">#FFFFFF</color>
+
+    <!-- Navigation menu -->
+    <color name="navigationBarBackground">#1B2939</color>
+    <color name="navigationBarText">#DAD8D8</color>
+    <color name="navigationBarTextSelected">#90CAF9</color>
+
+    <!-- Settings -->
+    <color name="settingsColor">#52b69a</color>
+    <color name="saveSettingsButton">#52b69a</color>
+    <color name="saveSettingsButtonText">#FFFFFF</color>
 </resources>

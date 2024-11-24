@@ -1,11 +1,9 @@
 package com.example.freshlife;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -43,11 +41,11 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
         // Change appearance based on whether the item is checked
         if (item.isChecked()) {
-            holder.itemName.setTextColor(context.getResources().getColor(R.color.secondaryTextColor, context.getTheme()));
-            holder.itemContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.light_grey));
+            holder.itemName.setTextColor(context.getResources().getColor(R.color.itemSecondaryTextColor, context.getTheme()));
+            holder.itemContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.checkedItem));
         } else {
-            holder.itemName.setTextColor(context.getResources().getColor(R.color.textColor, context.getTheme()));
-            holder.itemContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+            holder.itemName.setTextColor(context.getResources().getColor(R.color.itemTextColor, context.getTheme()));
+            holder.itemContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.defaultItem));
         }
 
         // Handle radio button clicks

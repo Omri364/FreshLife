@@ -653,7 +653,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         FloatingActionButton editButton = new FloatingActionButton(this);
         editButton.setImageResource(R.drawable.ic_edit);
         editButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.editLocationButtonBackground)));
-        editButton.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_IN);
+        editButton.setColorFilter(ContextCompat.getColor(this, R.color.editLocationsIcon), PorterDuff.Mode.SRC_IN);
         editButton.setSize(FloatingActionButton.SIZE_MINI); // Smaller size for better alignment
         editButton.setOnClickListener(v -> showEditLocationsDialog());
 
@@ -669,7 +669,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         for (String location : locations) {
             Button button = new Button(this);
             button.setText(location);
-            button.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+            button.setTextColor(ContextCompat.getColor(this, R.color.locationButtonText));
             button.setBackgroundResource(R.drawable.default_button_background);
 
             // Highlight the selected button

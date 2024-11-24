@@ -20,5 +20,7 @@
         android:id="@+id/addLocationButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Location" />
+        android:backgroundTint="@color/addLocationButton"
+        android:text="Add Location"
+        android:textColor="@color/addLocationButtonText"/>
 </LinearLayout>
