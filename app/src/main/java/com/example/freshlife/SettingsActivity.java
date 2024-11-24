@@ -4,22 +4,18 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.freshlife.utils.DataFetcher;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -29,6 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText notificationDaysInput;
     private TextView notificationTimeTextView;
     private SharedPreferences sharedPreferences;
+    private SwitchMaterial darkModeSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,16 +62,22 @@ public class SettingsActivity extends AppCompatActivity {
         notificationDaysInput = findViewById(R.id.notificationDaysInput);
         notificationTimeTextView = findViewById(R.id.notificationTimeTextView);
         MaterialButton saveSettingsButton = findViewById(R.id.saveSettingsButton);
+        darkModeSwitch = findViewById(R.id.darkModeSwitch);
 
         // Load saved preferences
         sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
         int savedDays = sharedPreferences.getInt("notificationDays", 3);
         int savedHour = sharedPreferences.getInt("notificationHour", 9);
         int savedMinute = sharedPreferences.getInt("notificationMinute", 0);
+        boolean isDarkMode = sharedPreferences.getBoolean("darkMode", false);
 
         // Set saved values
         notificationDaysInput.setText(String.valueOf(savedDays));
         notificationTimeTextView.setText(String.format(Locale.getDefault(), "%02d:%02d", savedHour, savedMinute));
+        darkModeSwitch.setChecked(isDarkMode);
+
+        // Apply dark mode based on saved preference
+        applyDarkMode(isDarkMode);
 
         // Open TimePickerDialog when time text is clicked
         notificationTimeTextView.setOnClickListener(v -> {
@@ -89,6 +92,17 @@ public class SettingsActivity extends AppCompatActivity {
                     }, hour, minute, true);
 
             timePickerDialog.show();
+        });
+
+        // Handle dark mode toggle
+        darkModeSwitch.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked) -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("darkMode", isChecked);
+            editor.apply();
+
+            applyDarkMode(isChecked);
+
+            Toast.makeText(this, "Dark mode " + (isChecked ? "enabled" : "disabled"), Toast.LENGTH_SHORT).show();
         });
 
         // Save preferences on button click
@@ -118,5 +132,13 @@ public class SettingsActivity extends AppCompatActivity {
                 NotificationScheduler.scheduleNotifications(this, foodItems);
             });
         });
+    }
+
+    private void applyDarkMode(boolean isDarkMode) {
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
     }
 }

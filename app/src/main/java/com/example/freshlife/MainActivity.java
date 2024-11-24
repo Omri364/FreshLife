@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -123,7 +124,12 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortSpinner.setAdapter(sortAdapter);
 
+        // apply dark mode if selected
         sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
+        boolean isDarkMode = sharedPreferences.getBoolean("darkMode", false);
+        applyDarkMode(isDarkMode);
+
+        // load storage locations
         loadLocations();
         LinearLayout locationButtonContainer = findViewById(R.id.locationButtonContainer);
         generateLocationButtons(locationButtonContainer);
@@ -834,6 +840,14 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             locations.add("All");
             locations.add("Unsorted");
             locations.add("Fridge");
+        }
+    }
+
+    private void applyDarkMode(boolean isDarkMode) {
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
     }
 }
