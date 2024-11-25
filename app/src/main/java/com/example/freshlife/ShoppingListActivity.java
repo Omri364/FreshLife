@@ -94,6 +94,9 @@ public class ShoppingListActivity extends AppCompatActivity {
                     shoppingItems.addAll(response.body());
                     adapter.notifyDataSetChanged();
                     updateRecyclerViewVisibility();
+
+                    // Apply default sorting
+                    sortShoppingItems(0); // Default to "Sort by A-Z"
                 } else {
                     Log.e("ShoppingListActivity", "Request failed with code: " + response.code());
                 }
@@ -207,6 +210,8 @@ public class ShoppingListActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+
+        sortShoppingItems(sortSpinner.getSelectedItemPosition());
     }
 
     private void addOrUpdateShoppingItem(String name, int quantity, String category) {
@@ -226,6 +231,8 @@ public class ShoppingListActivity extends AppCompatActivity {
             ShoppingItem newItem = new ShoppingItem(name, false, category, quantity);
             addShoppingItemToBackend(newItem);
         }
+
+        sortShoppingItems(sortSpinner.getSelectedItemPosition());
     }
 
     private void deleteShoppingItem(String id, int position) {
@@ -262,6 +269,9 @@ public class ShoppingListActivity extends AppCompatActivity {
             public void onResponse(Call<ShoppingItem> call, Response<ShoppingItem> response) {
                 if (response.isSuccessful()) {
                     adapter.notifyDataSetChanged();
+
+                    sortShoppingItems(sortSpinner.getSelectedItemPosition());
+
                     Toast.makeText(ShoppingListActivity.this, "Item updated", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(ShoppingListActivity.this, "Failed to update item", Toast.LENGTH_SHORT).show();
@@ -327,6 +337,8 @@ public class ShoppingListActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+
+        sortShoppingItems(sortSpinner.getSelectedItemPosition());
     }
 
     // Get category index for spinner
@@ -356,18 +368,46 @@ public class ShoppingListActivity extends AppCompatActivity {
                 // Do nothing
             }
         });
+
+        // Apply default sorting
+        sortShoppingItems(0); // Default to "Sort by A-Z"
     }
 
     private void sortShoppingItems(int sortOption) {
+        List<ShoppingItem> uncheckedItems = new ArrayList<>();
+        List<ShoppingItem> checkedItems = new ArrayList<>();
+
+        // Separate checked and unchecked items
+        for (ShoppingItem item : shoppingItems) {
+            if (item.isChecked()) {
+                checkedItems.add(item);
+            } else {
+                uncheckedItems.add(item);
+            }
+        }
+
+        // Apply sorting based on the selected option
+        Comparator<ShoppingItem> comparator;
         switch (sortOption) {
             case 0: // Sort by A-Z
-                shoppingItems.sort(Comparator.comparing(ShoppingItem::getName, String.CASE_INSENSITIVE_ORDER));
+                comparator = Comparator.comparing(ShoppingItem::getName, String.CASE_INSENSITIVE_ORDER);
                 break;
             case 1: // Sort by Category
-                shoppingItems.sort(Comparator.comparing(ShoppingItem::getCategory, String.CASE_INSENSITIVE_ORDER));
+                comparator = Comparator.comparing(ShoppingItem::getCategory, String.CASE_INSENSITIVE_ORDER);
                 break;
+            default:
+                comparator = (item1, item2) -> 0; // No sorting
         }
+
+        uncheckedItems.sort(comparator);
+        checkedItems.sort(comparator);
+
+        // Combine unchecked and checked items back into the main list
+        shoppingItems.clear();
+        shoppingItems.addAll(uncheckedItems);
+        shoppingItems.addAll(checkedItems);
 
         adapter.notifyDataSetChanged();
     }
+
 }
