@@ -371,14 +371,18 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
 
             // Validate inputs
             if (name.isEmpty()) {
-                Toast.makeText(this, "Please enter the food name", Toast.LENGTH_SHORT).show();
-            } else if (quantityStr.isEmpty()) {
-                Toast.makeText(this, "Please enter the quantity", Toast.LENGTH_SHORT).show();
-            } else if (expirationDate.isEmpty()) {
-                Toast.makeText(this, "Please select an expiration date", Toast.LENGTH_SHORT).show();
-            } else if (category.isEmpty()) {
-                Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show();
-            } else {
+                foodNameEditText.setError("Please enter the food name");
+                foodNameEditText.requestFocus();
+            }
+            if (quantityStr.isEmpty()) {
+                quantityEditText.setError("Please enter the quantity");
+                quantityEditText.requestFocus();
+            }
+            if (expirationDate.isEmpty()) {
+                expirationDateTextView.setError("Please enter the quantity");
+                expirationDateTextView.requestFocus();
+            }
+            if (!name.isEmpty() && !quantityStr.isEmpty() && !expirationDate.isEmpty()) {
                 // All inputs are valid; proceed with adding the item
                 int quantity = Integer.parseInt(quantityStr);
                 addFoodItem(new FoodItem(name, quantity, expirationDate, category ,replenishAutomatically, location));
@@ -430,7 +434,6 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             public void onResponse(Call<ShoppingItem> call, Response<ShoppingItem> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(MainActivity.this, "Added to shopping list", Toast.LENGTH_SHORT).show();
-//                    fetchShoppingItems(); // Refresh the shopping list
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to add to shopping list", Toast.LENGTH_SHORT).show();
                 }
@@ -521,15 +524,19 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
 
             // Validate inputs
             if (name.isEmpty()) {
-                Toast.makeText(this, "Please enter the food name", Toast.LENGTH_SHORT).show();
-            } else if (quantityStr.isEmpty()) {
-                Toast.makeText(this, "Please enter the quantity", Toast.LENGTH_SHORT).show();
-            } else if (expirationDate.isEmpty()) {
-                Toast.makeText(this, "Please select an expiration date", Toast.LENGTH_SHORT).show();
-            } else {
+                foodNameEditText.setError("Please enter the food name");
+                foodNameEditText.requestFocus();
+            }
+            if (quantityStr.isEmpty()) {
+                foodNameEditText.setError("Please enter the food name");
+                foodNameEditText.requestFocus();
+            }
+            if (expirationDate.isEmpty()) {
+                expirationDateTextView.setError("Please enter the quantity");
+                expirationDateTextView.requestFocus();
+            }
+            if (!name.isEmpty() && !quantityStr.isEmpty() && !expirationDate.isEmpty()) {
                 int quantity = Integer.parseInt(quantityStr);
-
-                // Update the item
                 foodItem.setName(name);
                 foodItem.setQuantity(quantity);
                 foodItem.setExpirationDate(expirationDate);
@@ -773,7 +780,11 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
         // Add new location
         addLocationButton.setOnClickListener(v -> {
             String newLocation = newLocationEditText.getText().toString().trim();
-            if (!newLocation.isEmpty() && !locations.contains(newLocation)) {
+            if (newLocation.isEmpty()) {
+                newLocationEditText.setError("Please enter the location name");
+                newLocationEditText.requestFocus();
+            }
+            else if (!locations.contains(newLocation)) {
                 locations.add(newLocation);
                 editableLocations.add(newLocation); // Also add to the filtered list
                 locationAdapter.notifyItemInserted(editableLocations.size() - 1);
