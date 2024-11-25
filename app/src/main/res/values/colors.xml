@@ -4,10 +4,10 @@
     <color name="backgroundColor">#F5F5F5</color>
     <color name="textColor">#212121</color>
     <color name="secondaryTextColor">#757575</color>
+
     <color name="primaryColor">#1B2939</color>
     <color name="accentColor">#52b69a</color>
 
-    <color name="colorAccent">#47ED0B</color>
 
     <color name="testColor">#47ED0B</color>
 

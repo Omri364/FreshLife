@@ -537,24 +537,34 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                 foodItem.setLocation(location);
                 foodItem.setReplenishAutomatically(replenishAutomatically);
 
-                updateFoodItem(foodItem, position);
+                updateFoodItem(foodItem);
                 dialog.dismiss();
             }
         });
     }
 
     // Update food item on the backend
-    private void updateFoodItem(FoodItem foodItem, int position) {
+    private void updateFoodItem(FoodItem foodItem) {
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
         Call<FoodItem> call = apiService.updateFoodItem(foodItem.getId(), foodItem);
 
         call.enqueue(new Callback<FoodItem>() {
             @Override
             public void onResponse(Call<FoodItem> call, Response<FoodItem> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
+                    int position = foodItems.indexOf(foodItem);
                     foodItems.set(position, foodItem);
                     filterAndSortFoodItems(); // Update view
                     foodAdapter.notifyItemChanged(position);
+
+//                    // Print food items list
+//                    Log.d("FoodItemsList", "Current foodItems list:");
+//                    for (int i = 0; i < foodItems.size(); i++) {
+//                        FoodItem item = foodItems.get(i);
+//                        Log.d("FoodItemsList", String.format("Position %d: %s (Quantity: %d, Category: %s, Expiration: %s)",
+//                                i, item.getName(), item.getQuantity(), item.getCategory(), item.getExpirationDate()));
+//                    }
+
                     Toast.makeText(MainActivity.this, "Item updated", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to update item", Toast.LENGTH_SHORT).show();

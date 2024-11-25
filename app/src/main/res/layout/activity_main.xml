@@ -74,7 +74,7 @@
         android:src="@drawable/ic_add"
         android:contentDescription="Add Food Item"
         app:backgroundTint="@color/addButton"
-        app:tint="@android:color/white"
+        app:tint="@color/addButtonIcon"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent" />
 

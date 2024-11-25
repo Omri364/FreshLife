@@ -8,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -36,6 +37,9 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
 
         // Set location name
         holder.locationName.setText(location);
+
+        // Set location name's color
+        holder.locationName.setTextColor(ContextCompat.getColor(context, R.color.secondaryTextColor));
 
         // Disable delete button for "All" and "Unsorted"
         if (location.equals("All") || location.equals("Unsorted")) {
