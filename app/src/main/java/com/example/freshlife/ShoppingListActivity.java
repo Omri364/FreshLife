@@ -202,9 +202,16 @@ public class ShoppingListActivity extends AppCompatActivity {
             String category = categorySpinner.getSelectedItem().toString();
             String quantityStr = quantityEditText.getText().toString().trim();
 
-            if (name.isEmpty() || quantityStr.isEmpty()) {
-                Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
-            } else {
+            // Validate inputs
+            if (name.isEmpty()) {
+                itemNameEditText.setError("Please enter the food name");
+                itemNameEditText.requestFocus();
+            }
+            if (quantityStr.isEmpty()) {
+                quantityEditText.setError("Please enter the quantity");
+                quantityEditText.requestFocus();
+            }
+            if (!name.isEmpty() && !quantityStr.isEmpty()) {
                 int quantity = Integer.parseInt(quantityStr);
                 addOrUpdateShoppingItem(name, quantity, category);
                 dialog.dismiss();
@@ -323,10 +330,14 @@ public class ShoppingListActivity extends AppCompatActivity {
 
             // Validate inputs
             if (name.isEmpty()) {
-                Toast.makeText(this, "Please enter the item name", Toast.LENGTH_SHORT).show();
-            } else if (quantityStr.isEmpty()) {
-                Toast.makeText(this, "Please enter the quantity", Toast.LENGTH_SHORT).show();
-            } else {
+                itemNameEditText.setError("Please enter the food name");
+                itemNameEditText.requestFocus();
+            }
+            if (quantityStr.isEmpty()) {
+                quantityEditText.setError("Please enter the quantity");
+                quantityEditText.requestFocus();
+            }
+            if (!name.isEmpty() && !quantityStr.isEmpty())  {
                 // Update the item
                 int quantity = Integer.parseInt(quantityStr);
                 shoppingItem.setName(name);

@@ -379,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                 quantityEditText.requestFocus();
             }
             if (expirationDate.isEmpty()) {
-                expirationDateTextView.setError("Please enter the quantity");
+                expirationDateTextView.setError("Please enter expiration date");
                 expirationDateTextView.requestFocus();
             }
             if (!name.isEmpty() && !quantityStr.isEmpty() && !expirationDate.isEmpty()) {
@@ -528,8 +528,8 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                 foodNameEditText.requestFocus();
             }
             if (quantityStr.isEmpty()) {
-                foodNameEditText.setError("Please enter the food name");
-                foodNameEditText.requestFocus();
+                quantityEditText.setError("Please enter the quantity");
+                quantityEditText.requestFocus();
             }
             if (expirationDate.isEmpty()) {
                 expirationDateTextView.setError("Please enter the quantity");
@@ -563,15 +563,6 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                     foodItems.set(position, foodItem);
                     filterAndSortFoodItems(); // Update view
                     foodAdapter.notifyItemChanged(position);
-
-//                    // Print food items list
-//                    Log.d("FoodItemsList", "Current foodItems list:");
-//                    for (int i = 0; i < foodItems.size(); i++) {
-//                        FoodItem item = foodItems.get(i);
-//                        Log.d("FoodItemsList", String.format("Position %d: %s (Quantity: %d, Category: %s, Expiration: %s)",
-//                                i, item.getName(), item.getQuantity(), item.getCategory(), item.getExpirationDate()));
-//                    }
-
                     Toast.makeText(MainActivity.this, "Item updated", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to update item", Toast.LENGTH_SHORT).show();
@@ -593,21 +584,6 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
             }
         }
         return 0; // Default to the first category
-    }
-
-    private void filterByLocation(String location) {
-        List<FoodItem> filteredItems;
-        if (location.equals("All Locations")) {
-            filteredItems = new ArrayList<>(foodItems);
-        } else {
-            filteredItems = new ArrayList<>();
-            for (FoodItem item : foodItems) {
-                if (item.getLocation().equals(location)) {
-                    filteredItems.add(item);
-                }
-            }
-        }
-        foodAdapter.updateList(filteredItems);
     }
 
     private void filterAndSortFoodItems() {
@@ -726,16 +702,6 @@ public class MainActivity extends AppCompatActivity implements FoodAdapter.OnDel
                 }
             }
         }
-    }
-
-
-    private int getLocationIndex(String location, String[] locations) {
-        for (int i = 0; i < locations.length; i++) {
-            if (locations[i].equalsIgnoreCase(location)) {
-                return i;
-            }
-        }
-        return 0; // Default to the first location
     }
 
     private void showEditLocationsDialog() {
