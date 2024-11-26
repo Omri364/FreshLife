@@ -19,6 +19,12 @@
         android:theme="@style/Theme.FreshLife"
         tools:targetApi="31">
         <activity
+            android:name=".RegistrationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".InventoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".ShoppingListActivity"
             android:exported="false" />
         <activity
@@ -33,6 +39,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <receiver android:name=".NotificationReceiver" />
     </application>
 

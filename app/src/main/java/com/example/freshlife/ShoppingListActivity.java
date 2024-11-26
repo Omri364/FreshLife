@@ -56,7 +56,7 @@ public class ShoppingListActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (item.getItemId() == R.id.navigation_inventory) {
-                Intent inventoryIntent = new Intent(ShoppingListActivity.this, MainActivity.class);
+                Intent inventoryIntent = new Intent(ShoppingListActivity.this, InventoryActivity.class);
                 startActivity(inventoryIntent);
                 overridePendingTransition(0, 0);
                 finish();

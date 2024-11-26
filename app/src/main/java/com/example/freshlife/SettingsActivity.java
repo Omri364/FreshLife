@@ -1,11 +1,13 @@
 package com.example.freshlife;
 
+import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,8 +22,13 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import java.util.Calendar;
 import java.util.Locale;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class SettingsActivity extends AppCompatActivity {
 
+    private FirebaseAuth mAuth;
+    private TextView userEmailTextView;
     private EditText notificationDaysInput;
     private TextView notificationTimeTextView;
     private SharedPreferences sharedPreferences;
@@ -31,6 +38,39 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        // Initialize FirebaseAuth
+        mAuth = FirebaseAuth.getInstance();
+
+        // Get the current user
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        // Set user email
+        userEmailTextView = findViewById(R.id.userEmailTextView);
+        if (currentUser != null) {
+            userEmailTextView.setText(currentUser.getEmail());
+        } else {
+            userEmailTextView.setText("Guest");
+        }
+
+        // Logout Button setup
+        ImageButton logoutButton = findViewById(R.id.logoutButton);
+        logoutButton.setOnClickListener(v -> {
+            // Show a confirmation dialog
+            new AlertDialog.Builder(this)
+                    .setTitle("Logout")
+                    .setMessage("Are you sure you want to logout?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        FirebaseAuth.getInstance().signOut();
+                        // Redirect to LoginActivity
+                        Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
 
         // Initialize bottom navigation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -42,7 +82,7 @@ public class SettingsActivity extends AppCompatActivity {
                 return true;
             } else if (item.getItemId() == R.id.navigation_inventory) {
                 // Open MainActivity
-                Intent inventoryIntent = new Intent(SettingsActivity.this, MainActivity.class);
+                Intent inventoryIntent = new Intent(SettingsActivity.this, InventoryActivity.class);
                 startActivity(inventoryIntent);
                 overridePendingTransition(0, 0);
                 finish();

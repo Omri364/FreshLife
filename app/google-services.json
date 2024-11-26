@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "996330402089",
+    "project_id": "freshlife-6a20b",
+    "storage_bucket": "freshlife-6a20b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996330402089:android:f3591aabb52bcde3860738",
+        "android_client_info": {
+          "package_name": "com.example.freshlife"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "996330402089-bdh99mq870g3gthgqupll6rn58kjg9us.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaj9OY_GwHG5ogNhVl5U3_FQhqlPRMsU8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996330402089-bdh99mq870g3gthgqupll6rn58kjg9us.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

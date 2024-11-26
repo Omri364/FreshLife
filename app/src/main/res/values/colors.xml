@@ -49,6 +49,7 @@
     <color name="settingsColor">#52b69a</color>
     <color name="saveSettingsButton">#52b69a</color>
     <color name="saveSettingsButtonText">#FFFFFF</color>
+    <color name="signOutColor">#52b69a</color>
 
     <!-- Backups -->
     <color name="navigationBarBackground2">#184e77</color>

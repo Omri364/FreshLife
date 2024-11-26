@@ -5,13 +5,56 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
     tools:context=".SettingsActivity">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <!-- User Icon -->
+    <ImageView
+        android:id="@+id/userIconImageView"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_user"
+        android:contentDescription="User Icon"
+        app:tint="@color/textColor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- User Email TextView -->
+    <TextView
+        android:id="@+id/userEmailTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="User Email"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/textColor"
+        app:layout_constraintStart_toEndOf="@id/userIconImageView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Logout Button -->
+    <ImageButton
+        android:id="@+id/logoutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Logout"
+        android:src="@drawable/ic_logout"
+        app:tint="@color/signOutColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/backgroundColor">
+        android:layout_height="731dp"
+        app:layout_constraintTop_toBottomOf="@id/userEmailTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,68 +79,68 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Notification Settings"
-                        android:textSize="18sp"
-                        android:textColor="@color/textColor"
+                        android:layout_marginBottom="8dp"
                         android:fontFamily="sans-serif-medium"
-                        android:layout_marginBottom="8dp" />
+                        android:text="Notification Settings"
+                        android:textColor="@color/textColor"
+                        android:textSize="18sp" />
 
                     <!-- Days to Notify Before Expiration -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="Days to notify before expiration"
-                            android:textSize="16sp"
                             android:textColor="@color/secondaryTextColor"
-                            android:layout_weight="1" />
+                            android:textSize="16sp" />
 
                         <EditText
                             android:id="@+id/notificationDaysInput"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:inputType="number"
-                            android:hint="3"
-                            android:backgroundTint="@color/settingsColor"
-                            android:textColor="@color/settingsColor"
-                            android:textColorHint="@color/settingsColor"
-                            android:maxLength="2"
                             android:layout_marginStart="16dp"
-                            android:layout_marginEnd="16dp" />
+                            android:layout_marginEnd="16dp"
+                            android:backgroundTint="@color/settingsColor"
+                            android:hint="3"
+                            android:inputType="number"
+                            android:maxLength="2"
+                            android:textColor="@color/settingsColor"
+                            android:textColorHint="@color/settingsColor" />
                     </LinearLayout>
 
                     <!-- Notification Time -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_marginTop="16dp"
                         android:gravity="center_vertical"
-                        android:layout_marginTop="16dp">
+                        android:orientation="horizontal">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="Notification time"
-                            android:textSize="16sp"
                             android:textColor="@color/secondaryTextColor"
-                            android:layout_weight="1" />
+                            android:textSize="16sp" />
 
                         <TextView
                             android:id="@+id/notificationTimeTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="09:00"
-                            android:textSize="16sp"
-                            android:textColor="@color/settingsColor"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginEnd="16dp" />
+                            android:text="09:00"
+                            android:textColor="@color/settingsColor"
+                            android:textSize="16sp" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -120,35 +163,35 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="App Settings"
-                        android:textSize="18sp"
-                        android:textColor="@color/textColor"
+                        android:layout_marginBottom="8dp"
                         android:fontFamily="sans-serif-medium"
-                        android:layout_marginBottom="8dp" />
+                        android:text="App Settings"
+                        android:textColor="@color/textColor"
+                        android:textSize="18sp" />
 
                     <!-- Dark Mode Toggle -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="Enable Dark Mode"
-                            android:textSize="16sp"
                             android:textColor="@color/secondaryTextColor"
-                            android:layout_weight="1" />
+                            android:textSize="16sp" />
 
                         <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/darkModeSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            app:layout_constraintTop_toBottomOf="@id/notificationTimeTextView"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
+                            app:layout_constraintTop_toBottomOf="@id/notificationTimeTextView" />
                     </LinearLayout>
 
                 </LinearLayout>
