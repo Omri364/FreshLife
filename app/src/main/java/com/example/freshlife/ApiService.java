@@ -4,36 +4,43 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.DELETE;
 import retrofit2.http.Path;
 import retrofit2.http.PUT;
+import retrofit2.http.Query;
 
 public interface ApiService {
+    // Retrieve food items for the user
+    @GET("food-items")
+    Call<List<FoodItem>> getFoodItems(@Header("Authorization") String token);
 
-    @GET("/food-items")
-    Call<List<FoodItem>> getFoodItems();
+    @POST("food-items")
+    Call<FoodItem> addFoodItem(@Header("Authorization") String token, @Body FoodItem foodItem);
 
-    @POST("/food-items")
-    Call<FoodItem> addFoodItem(@Body FoodItem foodItem);
+    @PUT("food-items/{id}")
+    Call<FoodItem> updateFoodItem(@Header("Authorization") String token, @Path("id") String id, @Body FoodItem foodItem);
 
-    @DELETE("/food-items/{id}")
-    Call<Void> deleteFoodItem(@Path("id") String foodItemId);
+    @DELETE("food-items/{id}")
+    Call<Void> deleteFoodItem(@Header("Authorization") String token, @Path("id") String id);
 
-    @PUT("/food-items/{id}")
-    Call<FoodItem> updateFoodItem(@Path("id") String id, @Body FoodItem foodItem);
-
+    // Retrieve shopping items for the user
     @GET("/shopping-items")
-    Call<List<ShoppingItem>> getShoppingItems();
+    Call<List<ShoppingItem>> getShoppingItems(@Header("Authorization") String token);
 
+    // Add a new shopping item
     @POST("/shopping-items")
-    Call<ShoppingItem> addShoppingItem(@Body ShoppingItem shoppingItem);
+    Call<ShoppingItem> addShoppingItem(@Header("Authorization") String token, @Body ShoppingItem shoppingItem);
 
+    // Delete a specific shopping item
     @DELETE("/shopping-items/{id}")
-    Call<Void> deleteShoppingItem(@Path("id") String id);
+    Call<Void> deleteShoppingItem(@Header("Authorization") String token, @Path("id") String id);
 
+    // Update an existing shopping item
     @PUT("/shopping-items/{id}")
-    Call<ShoppingItem> updateShoppingItem(@Path("id") String id, @Body ShoppingItem shoppingItem);
+    Call<ShoppingItem> updateShoppingItem(@Header("Authorization") String token, @Path("id") String id, @Body ShoppingItem shoppingItem);
 
 }
 

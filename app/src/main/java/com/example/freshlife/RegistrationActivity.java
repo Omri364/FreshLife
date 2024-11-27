@@ -1,6 +1,7 @@
 package com.example.freshlife;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -91,6 +92,16 @@ public class RegistrationActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Registration successful
                         FirebaseUser user = mAuth.getCurrentUser();
+
+                        // Save UID to SharedPreferences
+                        if (user != null) {
+                            String uid = user.getUid();
+                            SharedPreferences sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("uid", uid);
+                            editor.apply();
+                        }
+
                         Toast.makeText(RegistrationActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
 
                         // Redirect to MainActivity or any other activity

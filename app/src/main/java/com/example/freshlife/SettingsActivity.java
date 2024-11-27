@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    private String userUid;
     private FirebaseAuth mAuth;
     private TextView userEmailTextView;
     private EditText notificationDaysInput;
@@ -38,6 +39,17 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        // Retrieve the UID from SharedPreferences
+        sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
+        userUid = sharedPreferences.getString("uid", null);
+
+        if (userUid == null) {
+            // If UID is null, redirect to Login
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
 
         // Initialize FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
@@ -170,7 +182,7 @@ public class SettingsActivity extends AppCompatActivity {
             // Fetch items and schedule notifications
             DataFetcher.fetchFoodItemsFromDatabase(this, foodItems -> {
                 NotificationScheduler.scheduleNotifications(this, foodItems);
-            });
+            }, userUid);
         });
     }
 

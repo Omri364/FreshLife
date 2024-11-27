@@ -43,6 +43,7 @@ import com.example.freshlife.utils.DataFetcher;
 import com.example.freshlife.utils.RecyclerViewSwipeDecorator;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.text.ParseException;
@@ -60,6 +61,8 @@ import android.Manifest;
 
 public class InventoryActivity extends AppCompatActivity implements FoodAdapter.OnDeleteClickListener {
 
+    private String userUid;
+    private String token;
     private RecyclerView foodItemsRecyclerView;
     private Spinner locationFilterSpinner;
     private Spinner sortSpinner;
@@ -103,9 +106,21 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory);
 
+        // Retrieve the UID from SharedPreferences
+        sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
+        userUid = sharedPreferences.getString("uid", null);
+        token = "Bearer " + sharedPreferences.getString("authToken", null);
+
+        if (userUid == null) {
+            // If UID is null, redirect to Login
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
+
+        // Setup RecyclerView and Adapter
         foodItemsRecyclerView = findViewById(R.id.foodItemsRecyclerView);
         foodItemsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
         foodAdapter = new FoodAdapter(this, foodItems, this ,this::showEditFoodDialog);
         foodItemsRecyclerView.setAdapter(foodAdapter);
 
@@ -231,7 +246,7 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
             // Schedule notifications for fetched items
             Log.d("InventoryActivity", "Scheduling notifications for fetched items.");
             NotificationScheduler.scheduleNotifications(this, foodItems);
-        });
+        }, userUid);
     }
 
     @Override
@@ -254,7 +269,7 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
 
     private void deleteFoodItem(FoodItem foodItem, int position) {
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
-        Call<Void> call = apiService.deleteFoodItem(foodItem.getId());
+        Call<Void> call = apiService.deleteFoodItem(token, foodItem.getId());
 
         call.enqueue(new Callback<Void>() {
             @Override
@@ -384,42 +399,50 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
             if (!name.isEmpty() && !quantityStr.isEmpty() && !expirationDate.isEmpty()) {
                 // All inputs are valid; proceed with adding the item
                 int quantity = Integer.parseInt(quantityStr);
-                addFoodItem(new FoodItem(name, quantity, expirationDate, category ,replenishAutomatically, location));
+                addFoodItem(new FoodItem(userUid, name, quantity, expirationDate, category ,replenishAutomatically, location));
                 dialog.dismiss(); // Close the dialog
             }
         });
     }
 
     private void addFoodItem(FoodItem foodItem) {
-        ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
-        Call<FoodItem> call = apiService.addFoodItem(foodItem);
+        //TODO: change to simpler way
 
-        call.enqueue(new Callback<FoodItem>() {
-            @Override
-            public void onResponse(Call<FoodItem> call, Response<FoodItem> response) {
-                if (response.isSuccessful()) {
-                    FoodItem addedItem = response.body();
-                    if (addedItem != null) {
-                        // Add the new item to the current food items list
-                        foodItems.add(addedItem);
-                        // Filter and sort the list based on current location and sorting options
-                        filterAndSortFoodItems();
-                        // Notify the adapter to update the RecyclerView
-                        foodAdapter.notifyDataSetChanged();
+        FirebaseAuth.getInstance().getCurrentUser().getIdToken(true).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                String token = task.getResult().getToken();
+
+                // Proceed with adding the food item using the token
+                ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
+                Call<FoodItem> call = apiService.addFoodItem("Bearer " + token, foodItem);
+
+                call.enqueue(new Callback<FoodItem>() {
+                    @Override
+                    public void onResponse(Call<FoodItem> call, Response<FoodItem> response) {
+                        if (response.isSuccessful()) {
+                            FoodItem addedItem = response.body();
+                            if (addedItem != null) {
+                                foodItems.add(addedItem);
+                                filterAndSortFoodItems();
+                                foodAdapter.notifyDataSetChanged();
+                                Toast.makeText(InventoryActivity.this, "Item added successfully", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(InventoryActivity.this, "Failed to add item", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                    Toast.makeText(InventoryActivity.this, "Item added successfully", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(InventoryActivity.this, "Failed to add item", Toast.LENGTH_SHORT).show();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<FoodItem> call, Throwable t) {
-                Toast.makeText(InventoryActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onFailure(Call<FoodItem> call, Throwable t) {
+                        Toast.makeText(InventoryActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Log.e("InventoryActivity", "Failed to get token", task.getException());
+                Toast.makeText(InventoryActivity.this, "Authentication error. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 
 
     // Add item to shopping list
@@ -427,7 +450,9 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
         ShoppingItem shoppingItem = new ShoppingItem(foodItem.getName(), false, foodItem.getCategory(), foodItem.getQuantity());
 
-        Call<ShoppingItem> call = apiService.addShoppingItem(shoppingItem);
+//        String token = "Bearer " + sharedPreferences.getString("authToken", "");
+
+        Call<ShoppingItem> call = apiService.addShoppingItem(token, shoppingItem);
         call.enqueue(new Callback<ShoppingItem>() {
             @Override
             public void onResponse(Call<ShoppingItem> call, Response<ShoppingItem> response) {
@@ -551,8 +576,12 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
 
     // Update food item on the backend
     private void updateFoodItem(FoodItem foodItem) {
+        foodItem.setUid(userUid); // Attach UID to the food item
+
+//        String token = "Bearer " + sharedPreferences.getString("authToken", "");
+
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
-        Call<FoodItem> call = apiService.updateFoodItem(foodItem.getId(), foodItem);
+        Call<FoodItem> call = apiService.updateFoodItem(token, foodItem.getId(), foodItem);
 
         call.enqueue(new Callback<FoodItem>() {
             @Override
@@ -780,7 +809,7 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
                 item.setLocation("Unsorted");
 
                 // Update item in backend
-                Call<FoodItem> call = apiService.updateFoodItem(item.getId(), item);
+                Call<FoodItem> call = apiService.updateFoodItem(item.getId(), userUid, item);
                 call.enqueue(new Callback<FoodItem>() {
                     @Override
                     public void onResponse(Call<FoodItem> call, Response<FoodItem> response) {

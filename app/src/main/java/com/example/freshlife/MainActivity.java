@@ -136,8 +136,23 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     progressBar.setVisibility(View.GONE);
                     if (task.isSuccessful()) {
-                        Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                        navigateToInventory();
+                        // Get the ID token
+                        firebaseAuth.getCurrentUser().getIdToken(true)
+                                .addOnCompleteListener(tokenTask -> {
+                                    if (tokenTask.isSuccessful()) {
+                                        // Save ID token to SharedPreferences
+                                        String idToken = tokenTask.getResult().getToken();
+                                        SharedPreferences sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                                        editor.putString("authToken", idToken); // Save ID token instead of UID
+                                        editor.apply();
+
+                                        Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                                        navigateToInventory();
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "Error fetching token: " + tokenTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                     } else {
                         Toast.makeText(MainActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }

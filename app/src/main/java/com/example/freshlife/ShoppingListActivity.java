@@ -2,6 +2,7 @@ package com.example.freshlife;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,15 +36,30 @@ import retrofit2.Response;
 
 public class ShoppingListActivity extends AppCompatActivity {
 
+    private String authToken;
     private RecyclerView recyclerView;
     private ShoppingListAdapter adapter;
     private List<ShoppingItem> shoppingItems = new ArrayList<>();
     private Spinner sortSpinner;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
+
+        // Retrieve the UID from SharedPreferences
+        sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
+        authToken = sharedPreferences.getString("authToken", null);
+
+//        Log.e("ShoppingListActivity", "Token i received: " + authToken);
+
+        if (authToken == null) {
+            // If UID is null, redirect to Login
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.navigation_shopping_list);
@@ -84,7 +100,7 @@ public class ShoppingListActivity extends AppCompatActivity {
 
     private void fetchShoppingItems() {
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
-        Call<List<ShoppingItem>> call = apiService.getShoppingItems();
+        Call<List<ShoppingItem>> call = apiService.getShoppingItems("Bearer " + authToken);
 
         call.enqueue(new Callback<List<ShoppingItem>>() {
             @Override
@@ -111,7 +127,7 @@ public class ShoppingListActivity extends AppCompatActivity {
 
     private void addShoppingItemToBackend(ShoppingItem newItem) {
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
-        Call<ShoppingItem> call = apiService.addShoppingItem(newItem);
+        Call<ShoppingItem> call = apiService.addShoppingItem("Bearer " + authToken, newItem);
 
         call.enqueue(new Callback<ShoppingItem>() {
             @Override
@@ -244,7 +260,7 @@ public class ShoppingListActivity extends AppCompatActivity {
 
     private void deleteShoppingItem(String id, int position) {
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
-        Call<Void> call = apiService.deleteShoppingItem(id);
+        Call<Void> call = apiService.deleteShoppingItem("Bearer " + authToken, id);
 
         call.enqueue(new Callback<Void>() {
             @Override
@@ -269,7 +285,7 @@ public class ShoppingListActivity extends AppCompatActivity {
 
     private void updateShoppingItem(ShoppingItem item) {
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
-        Call<ShoppingItem> call = apiService.updateShoppingItem(item.getId(), item);
+        Call<ShoppingItem> call = apiService.updateShoppingItem("Bearer " + authToken, item.getId(), item);
 
         call.enqueue(new Callback<ShoppingItem>() {
             @Override

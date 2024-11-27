@@ -2,6 +2,7 @@ package com.example.freshlife.utils;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.freshlife.ApiService;
 import com.example.freshlife.FoodItem;
@@ -19,10 +20,10 @@ public class DataFetcher {
         void onFoodItemsFetched(List<FoodItem> foodItems);
     }
 
-    public static void fetchFoodItemsFromDatabase(Context context, FoodItemsCallback callback) {
+    public static void fetchFoodItemsFromDatabase(Context context, FoodItemsCallback callback, String userUid) {
+        String token = context.getSharedPreferences("FreshLifePrefs", Context.MODE_PRIVATE).getString("authToken", "");
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
-
-        Call<List<FoodItem>> call = apiService.getFoodItems();
+        Call<List<FoodItem>> call = apiService.getFoodItems("Bearer " + token);
         call.enqueue(new Callback<List<FoodItem>>() {
             @Override
             public void onResponse(Call<List<FoodItem>> call, Response<List<FoodItem>> response) {
