@@ -9,26 +9,45 @@
     tools:context=".InventoryActivity">
 
     <!-- Location Buttons -->
-    <HorizontalScrollView
-        android:id="@+id/locationScrollView"
+    <LinearLayout
+        android:id="@+id/locationButtonContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true"
-        android:scrollbars="none"
+        android:orientation="horizontal"
+        android:gravity="center"
         android:layout_margin="8dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
-            android:id="@+id/locationButtonContainer"
+        <Button
+            android:id="@+id/buttonAll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center_vertical" />
+            android:backgroundTint="@color/selectedButtonLocationBackground"
+            android:text="All"
+            android:textColor="@color/locationButtonText"/>
 
-    </HorizontalScrollView>
+        <Button
+            android:id="@+id/buttonFridge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/buttonLocationBackground"
+            android:text="Fridge"
+            android:textColor="@color/locationButtonText"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
 
+        <Button
+            android:id="@+id/buttonPantry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/buttonLocationBackground"
+            android:text="Pantry"
+            android:textColor="@color/locationButtonText"/>
+
+
+    </LinearLayout>
 
     <!-- Sorting Spinner -->
     <Spinner
@@ -36,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        app:layout_constraintTop_toBottomOf="@id/locationScrollView"
+        app:layout_constraintTop_toBottomOf="@id/locationButtonContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

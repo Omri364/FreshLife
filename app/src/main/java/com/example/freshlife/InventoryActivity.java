@@ -64,12 +64,11 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
     private String userUid;
     private String token;
     private RecyclerView foodItemsRecyclerView;
-    private Spinner locationFilterSpinner;
     private Spinner sortSpinner;
     private FoodAdapter foodAdapter;
     private List<FoodItem> foodItems = new ArrayList<>();
     private static final int REQUEST_NOTIFICATION_PERMISSION = 1;
-    private List<String> locations = new ArrayList<>(Arrays.asList("All", "Unsorted", "Fridge"));
+    private List<String> locations = new ArrayList<>(Arrays.asList("All", "Fridge", "Pantry"));
     private String selectedLocation = "All";
     private static final String LOCATIONS_KEY = "locations_key";
     private SharedPreferences sharedPreferences;
@@ -143,10 +142,8 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         boolean isDarkMode = sharedPreferences.getBoolean("darkMode", false);
         applyDarkMode(isDarkMode);
 
-        // load storage locations
-        loadLocations();
-        LinearLayout locationButtonContainer = findViewById(R.id.locationButtonContainer);
-        generateLocationButtons(locationButtonContainer);
+        // set storage locations
+        setupLocationButtons();
 
         // Handle sorting selection
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -666,196 +663,39 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         }
     }
 
+    private void setupLocationButtons() {
+        Button buttonAll = findViewById(R.id.buttonAll);
+        Button buttonFridge = findViewById(R.id.buttonFridge);
+        Button buttonPantry = findViewById(R.id.buttonPantry);
 
-    private void generateLocationButtons(LinearLayout locationButtonContainer) {
-        locationButtonContainer.removeAllViews();
+        View.OnClickListener locationClickListener = v -> {
+            Button clickedButton = (Button) v;
+            selectedLocation = clickedButton.getText().toString();
 
-        // Add the edit button at the beginning
-        FloatingActionButton editButton = new FloatingActionButton(this);
-        editButton.setImageResource(R.drawable.ic_edit);
-        editButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.editLocationButtonBackground)));
-        editButton.setColorFilter(ContextCompat.getColor(this, R.color.editLocationsIcon), PorterDuff.Mode.SRC_IN);
-        editButton.setSize(FloatingActionButton.SIZE_MINI); // Smaller size for better alignment
-        editButton.setOnClickListener(v -> showEditLocationsDialog());
+            // Update styles for all buttons
+            buttonAll.setBackgroundColor(ContextCompat.getColor(this, selectedLocation.equals("All")
+                    ? R.color.selectedButtonLocationBackground
+                    : R.color.buttonLocationBackground));
 
-        // Create a layout for proper padding/margin for the edit button
-        LinearLayout.LayoutParams editButtonParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        editButtonParams.setMargins(8, 0, 16, 0); // Add some spacing
-        locationButtonContainer.addView(editButton, editButtonParams);
+            buttonFridge.setBackgroundColor(ContextCompat.getColor(this, selectedLocation.equals("Fridge")
+                    ? R.color.selectedButtonLocationBackground
+                    : R.color.buttonLocationBackground));
 
-        // Add location buttons
-        for (String location : locations) {
-            Button button = new Button(this);
-            button.setText(location);
-            button.setTextColor(ContextCompat.getColor(this, R.color.locationButtonText));
-            button.setBackgroundResource(R.drawable.default_button_background);
-
-            // Highlight the selected button
-            if (location.equals(selectedLocation)) {
-                button.setBackgroundResource(R.drawable.selected_button_background);
-            }
-
-            button.setOnClickListener(v -> {
-                selectedLocation = location;
-
-                // Highlight the selected button and reset others
-                updateButtonStyles(locationButtonContainer);
-                filterAndSortFoodItems();
-            });
-
-            // Add proper spacing for location buttons
-            LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            buttonParams.setMargins(16, 0, 16, 0); // Add space between buttons
-            locationButtonContainer.addView(button, buttonParams);
-        }
-    }
+            buttonPantry.setBackgroundColor(ContextCompat.getColor(this, selectedLocation.equals("Pantry")
+                    ? R.color.selectedButtonLocationBackground
+                    : R.color.buttonLocationBackground));
 
 
-    private void updateButtonStyles(LinearLayout locationButtonContainer) {
-        for (int i = 0; i < locationButtonContainer.getChildCount(); i++) {
-            View view = locationButtonContainer.getChildAt(i);
-            if (view instanceof Button) {
-                Button button = (Button) view;
+            // Filter and sort the items based on the selected location
+            filterAndSortFoodItems();
+        };
 
-                if (button.getText().toString().equals(selectedLocation)) {
-                    button.setBackgroundResource(R.drawable.selected_button_background);
-                } else {
-                    button.setBackgroundResource(R.drawable.default_button_background);
-                }
-            }
-        }
-    }
+        // Attach click listeners
+        buttonAll.setOnClickListener(locationClickListener);
+        buttonFridge.setOnClickListener(locationClickListener);
+        buttonPantry.setOnClickListener(locationClickListener);
 
-    private void showEditLocationsDialog() {
-        // Inflate the custom dialog layout
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View dialogView = inflater.inflate(R.layout.dialog_edit_locations, null);
-
-        // Initialize the dialog elements
-        RecyclerView locationsRecyclerView = dialogView.findViewById(R.id.locationsRecyclerView);
-        EditText newLocationEditText = dialogView.findViewById(R.id.newLocationEditText);
-        Button addLocationButton = dialogView.findViewById(R.id.addLocationButton);
-
-        // Filter out "All" and "Unsorted" from the locations
-        List<String> editableLocations = new ArrayList<>();
-        for (String location : locations) {
-            if (!location.equals("All") && !location.equals("Unsorted")) {
-                editableLocations.add(location);
-            }
-        }
-
-        // RecyclerView setup for editing locations
-        locationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Initialize the LocationAdapter with filtered locations
-        LocationAdapter locationAdapter = new LocationAdapter(this, editableLocations, position -> {
-            // Remove the location from the list
-            String deletedLocation = editableLocations.get(position);
-            editableLocations.remove(position);
-            locations.remove(deletedLocation); // Update the main locations list
-            // Notify the adapter that the data has changed
-            locationsRecyclerView.getAdapter().notifyItemRemoved(position);
-
-            // Handle items from deleted location
-            moveItemsToUnsorted(deletedLocation);
-
-            // Regenerate the location buttons dynamically
-            generateLocationButtons((LinearLayout) findViewById(R.id.locationButtonContainer));
-        });
-        // Set the adapter to the RecyclerView
-        locationsRecyclerView.setAdapter(locationAdapter);
-
-        // Add new location
-        addLocationButton.setOnClickListener(v -> {
-            String newLocation = newLocationEditText.getText().toString().trim();
-            if (newLocation.isEmpty()) {
-                newLocationEditText.setError("Please enter the location name");
-                newLocationEditText.requestFocus();
-            }
-            else if (!locations.contains(newLocation)) {
-                locations.add(newLocation);
-                editableLocations.add(newLocation); // Also add to the filtered list
-                locationAdapter.notifyItemInserted(editableLocations.size() - 1);
-                generateLocationButtons((LinearLayout) findViewById(R.id.locationButtonContainer));
-            }
-        });
-
-        // Show the dialog
-        new AlertDialog.Builder(this)
-                .setTitle("Edit Locations")
-                .setView(dialogView)
-                .setPositiveButton("Done", (dialog, which) -> {
-                    saveLocations(); // Save updated locations to SharedPreferences
-                })
-                .show();
-    }
-
-
-    /**
-     * Move items from a deleted location to "Unsorted".
-     */
-    private void moveItemsToUnsorted(String deletedLocation) {
-        ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
-
-        // Iterate through all items and update those in the deleted location
-        for (FoodItem item : foodItems) {
-            if (item.getLocation().equalsIgnoreCase(deletedLocation)) {
-                item.setLocation("Unsorted");
-
-                // Update item in backend
-                Call<FoodItem> call = apiService.updateFoodItem(item.getId(), userUid, item);
-                call.enqueue(new Callback<FoodItem>() {
-                    @Override
-                    public void onResponse(Call<FoodItem> call, Response<FoodItem> response) {
-                        if (response.isSuccessful()) {
-                            Log.d("InventoryActivity", "Item moved to Unsorted: " + item.getName());
-                        } else {
-                            Log.e("InventoryActivity", "Failed to update item: " + response.message());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<FoodItem> call, Throwable t) {
-                        Log.e("InventoryActivity", "Error moving item to Unsorted", t);
-                    }
-                });
-            }
-        }
-    }
-
-    // Save locations to SharedPreferences
-    private void saveLocations() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        StringBuilder locationsString = new StringBuilder();
-        for (String location : locations) {
-            locationsString.append(location).append(",");
-        }
-        // Remove the trailing comma
-        if (locationsString.length() > 0) {
-            locationsString.setLength(locationsString.length() - 1);
-        }
-        editor.putString(LOCATIONS_KEY, locationsString.toString());
-        editor.apply();
-    }
-
-    // Load locations from SharedPreferences
-    private void loadLocations() {
-        String savedLocations = sharedPreferences.getString(LOCATIONS_KEY, null);
-        locations.clear();
-        if (savedLocations != null) {
-            Collections.addAll(locations, savedLocations.split(","));
-        } else {
-            // Default locations
-            locations.add("All");
-            locations.add("Unsorted");
-            locations.add("Fridge");
-        }
+        filterAndSortFoodItems();
     }
 
     private void applyDarkMode(boolean isDarkMode) {
