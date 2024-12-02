@@ -9,19 +9,31 @@
     android:background="@color/backgroundColor"
     tools:context=".MainActivity">
 
+    <!-- App Icon -->
+    <ImageView
+        android:id="@+id/appIconImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@mipmap/ic_launcher"
+        android:background="@drawable/rounded_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="50dp" />
+
     <!-- Title -->
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="FreshLife Login"
+        android:text="Welcome to FreshLife!"
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="@color/primaryColor"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appIconImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.2" />
+        android:layout_marginTop="16dp" />
 
     <!-- Email Input -->
     <EditText
@@ -57,34 +69,97 @@
         android:layout_marginTop="16dp" />
 
     <!-- Login Button -->
-    <Button
+    <LinearLayout
         android:id="@+id/loginButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Login"
-        android:backgroundTint="@color/primaryColor"
-        android:textColor="@android:color/white"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
+        android:orientation="horizontal"
+        android:backgroundTint="@color/loginButton"
+        android:background="@drawable/rounded_background"
+        android:gravity="center"
+        android:padding="12dp"
         app:layout_constraintTop_toBottomOf="@id/passwordEditText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <!-- Register Button -->
-    <Button
-        android:id="@+id/registerButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Register"
-        android:backgroundTint="@color/accentColor"
-        android:textColor="@android:color/white"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
+        android:layout_marginTop="8dp">
+
+        <!-- Text for the button -->
+        <TextView
+            android:id="@+id/signInInText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Sign in"
+            android:textColor="@color/loginButtonText"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- Sign in with Google Button -->
+    <LinearLayout
+        android:id="@+id/googleSignInButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:backgroundTint="@color/googleLoginButton"
+        android:background="@drawable/rounded_background"
+        android:gravity="center"
+        android:padding="12dp"
         app:layout_constraintTop_toBottomOf="@id/loginButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="14dp">
+
+        <!-- Icon with adjustable size -->
+        <ImageView
+            android:id="@+id/googleIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_google"
+            android:contentDescription="Google Logo" />
+
+        <!-- Text for the button -->
+        <TextView
+            android:id="@+id/googleSignInText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Sign in with Google"
+            android:textColor="@color/googleLoginButtonText"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- Forgot Password Link -->
+    <TextView
+        android:id="@+id/forgotPasswordTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Forgot Password"
+        android:textColor="@color/primaryColor"
+        android:textSize="16sp"
+        android:layout_marginTop="14dp"
+        app:layout_constraintTop_toBottomOf="@id/googleSignInButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Register Link -->
+    <TextView
+        android:id="@+id/registerLinkTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New User? Sign Up"
+        android:textColor="@color/accentColor"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/forgotPasswordTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Progress Bar -->
     <ProgressBar
@@ -92,7 +167,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/registerButton"
+        app:layout_constraintTop_toBottomOf="@id/registerLinkTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="32dp" />

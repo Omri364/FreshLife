@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
@@ -43,6 +44,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.example.freshlife.utils.DataFetcher;
 import com.example.freshlife.utils.RecyclerViewSwipeDecorator;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -61,15 +68,21 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import android.Manifest;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 
 public class MainActivity extends AppCompatActivity {
 
+    private TextView registerLink, forgotPasswordLink;
     private EditText emailEditText, passwordEditText;
-    private Button loginButton, registerButton;
+    private LinearLayout loginButton, googleLoginButton;
     private ProgressBar progressBar;
     private FirebaseAuth firebaseAuth;
+    private static final int RC_SIGN_IN = 100; // Request code for Google Sign-In
+    private GoogleSignInClient googleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +102,9 @@ public class MainActivity extends AppCompatActivity {
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
-        registerButton = findViewById(R.id.registerButton);
+        googleLoginButton = findViewById(R.id.googleSignInButton);
+        registerLink = findViewById(R.id.registerLinkTextView);
+        forgotPasswordLink = findViewById(R.id.forgotPasswordTextView);
         progressBar = findViewById(R.id.progressBar);
 
         // Handle login button click
@@ -101,12 +116,35 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Handle register button click
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigateToRegistration();
+        registerLink.setOnClickListener(v -> navigateToRegistration());
+
+        // Forgot password
+        forgotPasswordLink.setOnClickListener(v -> {
+            String email = emailEditText.getText().toString().trim();
+            if (TextUtils.isEmpty(email)) {
+                Toast.makeText(MainActivity.this, "Enter your registered email", Toast.LENGTH_SHORT).show();
+            } else {
+                firebaseAuth.sendPasswordResetEmail(email)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(MainActivity.this, "Password reset email sent", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(MainActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
+
+        // Configure Google Sign-In
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id)) // Get this from google-services.json
+                .requestEmail()
+                .build();
+
+        googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+
+        // Google Sign-In
+        googleLoginButton.setOnClickListener(v -> handleGoogleSignIn());
     }
 
     private void loginUser() {
@@ -170,6 +208,45 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void handleGoogleSignIn() {
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+
+        // TODO: make sure im saving uid in shared preferences
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // Google Sign-In successful
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account.getIdToken());
+            } catch (ApiException e) {
+                // Google Sign-In failed
+                Toast.makeText(this, "Google Sign-In failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign-In successful
+                        FirebaseUser user = firebaseAuth.getCurrentUser();
+                        Toast.makeText(this, "Welcome, " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                        navigateToInventory();
+                    } else {
+                        // Sign-In failed
+                        Toast.makeText(this, "Authentication Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
 }
 

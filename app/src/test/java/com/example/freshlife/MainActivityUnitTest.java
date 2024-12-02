@@ -31,9 +31,9 @@ public class MainActivityUnitTest {
         foodItems = new ArrayList<>();
 
         // Mock food items
-        foodItems.add(new FoodItem("Apples", 2, "2024-12-01", "Fruit", false, "Fridge"));
-        foodItems.add(new FoodItem("Bananas", 3, "2024-11-25", "Fruit", true, "Fridge"));
-        foodItems.add(new FoodItem("Milk", 1, "2024-11-30", "Dairy", false, "Unsorted"));
+//        foodItems.add(new FoodItem("Apples", 2, "2024-12-01", "Fruit", false, "Fridge"));
+//        foodItems.add(new FoodItem("Bananas", 3, "2024-11-25", "Fruit", true, "Fridge"));
+//        foodItems.add(new FoodItem("Milk", 1, "2024-11-30", "Dairy", false, "Unsorted"));
     }
 
     @Test

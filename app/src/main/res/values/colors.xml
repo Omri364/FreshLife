@@ -11,6 +11,12 @@
 
     <color name="testColor">#47ED0B</color>
 
+    <!-- Registration -->
+    <color name="loginButton">#1B2939</color>
+    <color name="loginButtonText">#F5F5F5</color>
+    <color name="googleLoginButton">#E0E0E0</color>
+    <color name="googleLoginButtonText">#1B2939</color>
+
 <!--    <color name="primaryDarkColor">#003049</color>-->
 
 <!--    <color name="white">#FFFFFF</color>-->
