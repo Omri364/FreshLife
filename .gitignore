@@ -16,8 +16,11 @@
 # Keystore files
 *.jks
 
-# Node.js dependencies (if you have a Node server)
+# Node.js dependencies
 /node_modules/
+.env
+serviceAccountKey.json
 
 # Mac system files
 .DS_Store
+
