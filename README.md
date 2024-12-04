@@ -3,17 +3,11 @@
 FreshLife is an Android app designed to help users track food items in their inventory and shopping list. With FreshLife, users can efficiently manage their food storage, reduce waste, and stay organized.
 
 ## Screenshots
-
-### Login Screen
-<img src="assets/snapshots/snapshot_login.png" alt="Login Screen" width="200"/>
-
-### Inventory Screen
-<img src="assets/snapshots/snapshot_add_item.png" alt="Inventory Add Item Screen" width="200"/>
-
-### Shopping List Screen
-<img src="assets/snapshots/snapshot_shopping_list.png" alt="Shopping List Screen" width="200"/>
-
-## Tech Stack
+<div style="display: flex; justify-content: space-around;">
+  <img src="assets/snapshots/snapshot_login.png" alt="Login Screen" width="80"/>
+  <img src="assets/snapshots/snapshot_add_item.png" alt="Inventory Add Item Screen" width="80"/>
+  <img src="assets/snapshots/snapshot_shopping_list.png" alt="Shopping List Screen" width="80"/>
+</div>
 
 ## Features
 
@@ -36,6 +30,8 @@ FreshLife is an Android app designed to help users track food items in their inv
 
 ### Multi-Device Sync
 - **Firebase Integration**: All data is stored in the cloud and synced across devices.
+
+## Tech Stack
 
 ### Frontend
 - **Java**: Main language for Android development.
