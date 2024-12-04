@@ -209,10 +209,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleGoogleSignIn() {
-        Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-
-        // TODO: make sure im saving uid in shared preferences
+        // Sign out from GoogleSignInClient to force account picker dialog
+        googleSignInClient.signOut().addOnCompleteListener(task -> {
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        });
     }
 
     @Override
@@ -232,18 +233,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        firebaseAuth.signInWithCredential(credential)
+        FirebaseAuth.getInstance().signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Sign-In successful
-                        FirebaseUser user = firebaseAuth.getCurrentUser();
-                        Toast.makeText(this, "Welcome, " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
-                        navigateToInventory();
+                        // Successfully authenticated, retrieve Firebase ID token
+                        FirebaseAuth.getInstance().getCurrentUser().getIdToken(true)
+                                .addOnCompleteListener(tokenTask -> {
+                                    if (tokenTask.isSuccessful()) {
+                                        String firebaseToken = tokenTask.getResult().getToken();
+
+                                        // Save the Firebase ID token to SharedPreferences
+                                        SharedPreferences sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
+                                        sharedPreferences.edit()
+                                                .putString("authToken", firebaseToken)
+                                                .apply();
+
+                                        Log.d("FirebaseToken", "Firebase Token: " + firebaseToken);
+
+                                        navigateToInventory();
+                                    } else {
+                                        Log.e("FirebaseToken", "Failed to get Firebase token", tokenTask.getException());
+                                    }
+                                });
                     } else {
-                        // Sign-In failed
-                        Toast.makeText(this, "Authentication Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("FirebaseAuth", "Firebase authentication failed", task.getException());
                     }
                 });
     }

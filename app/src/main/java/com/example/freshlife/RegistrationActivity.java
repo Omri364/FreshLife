@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class RegistrationActivity extends AppCompatActivity {
 
     private EditText editTextEmail, editTextPassword, editTextConfirmPassword;
-    private Button buttonRegister, buttonLogin;
+    private Button buttonRegister;
     private ProgressBar progressBar;
     private FirebaseAuth mAuth;
 
@@ -35,18 +35,10 @@ public class RegistrationActivity extends AppCompatActivity {
         editTextPassword = findViewById(R.id.editTextPassword);
         editTextConfirmPassword = findViewById(R.id.editTextConfirmPassword);
         buttonRegister = findViewById(R.id.buttonRegister);
-        buttonLogin = findViewById(R.id.buttonLogin);
         progressBar = findViewById(R.id.progressBar);
 
         // Set up registration button click listener
         buttonRegister.setOnClickListener(v -> registerUser());
-
-        // Redirect to LoginActivity
-        buttonLogin.setOnClickListener(v -> {
-            Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        });
     }
 
     private void registerUser() {
@@ -93,21 +85,30 @@ public class RegistrationActivity extends AppCompatActivity {
                         // Registration successful
                         FirebaseUser user = mAuth.getCurrentUser();
 
-                        // Save UID to SharedPreferences
                         if (user != null) {
-                            String uid = user.getUid();
-                            SharedPreferences sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString("uid", uid);
-                            editor.apply();
+                            // Retrieve Firebase ID token
+                            user.getIdToken(true)
+                                    .addOnCompleteListener(tokenTask -> {
+                                        if (tokenTask.isSuccessful()) {
+                                            String idToken = tokenTask.getResult().getToken();
+
+                                            // Save token to SharedPreferences
+                                            SharedPreferences sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
+                                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                                            editor.putString("authToken", idToken);
+                                            editor.apply();
+
+                                            Toast.makeText(RegistrationActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
+
+                                            // Redirect to MainActivity or any other activity
+                                            Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            Toast.makeText(RegistrationActivity.this, "Failed to get token: " + tokenTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                         }
-
-                        Toast.makeText(RegistrationActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
-
-                        // Redirect to MainActivity or any other activity
-                        Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
                     } else {
                         // Registration failed
                         Toast.makeText(RegistrationActivity.this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
