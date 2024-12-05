@@ -54,6 +54,11 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
             boolean currentChecked = !item.isChecked();
             item.setChecked(currentChecked); // Update the item state
             moveCheckedItems(); // Reorganize the list (checked items at the bottom)
+            // Call the sorting logic
+            if (context instanceof ShoppingListActivity) {
+                ((ShoppingListActivity) context).sortShoppingList();
+                ((ShoppingListActivity) context).updateShoppingItemBackend(item);
+            }
             notifyDataSetChanged(); // Refresh RecyclerView
         });
 

@@ -98,6 +98,30 @@ public class ShoppingListActivity extends AppCompatActivity {
         setupSwipeToDelete();
     }
 
+    // public wrapper for sorting
+    protected void sortShoppingList() {
+        sortShoppingItems(sortSpinner.getSelectedItemPosition());
+        updateRecyclerViewVisibility();
+    }
+
+    // public wrapper for updating
+    protected void updateShoppingItemBackend(ShoppingItem item) {
+        ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
+        Call<ShoppingItem> call = apiService.updateShoppingItem("Bearer " + authToken, item.getId(), item);
+        call.enqueue(new Callback<ShoppingItem>() {
+            @Override
+            public void onResponse(Call<ShoppingItem> call, Response<ShoppingItem> response) {
+                if (!response.isSuccessful()) {
+                    Log.e("ShoppingListActivity", "Failed to update item on backend: " + response.message());
+                }
+            }
+            @Override
+            public void onFailure(Call<ShoppingItem> call, Throwable t) {
+                Log.e("ShoppingListActivity", "Error updating item on backend: " + t.getMessage());
+            }
+        });
+    }
+
     private void fetchShoppingItems() {
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
         Call<List<ShoppingItem>> call = apiService.getShoppingItems("Bearer " + authToken);
@@ -135,6 +159,7 @@ public class ShoppingListActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     ShoppingItem addedItem = response.body();
                     shoppingItems.add(addedItem);
+                    sortShoppingItems(sortSpinner.getSelectedItemPosition());
                     adapter.notifyItemInserted(shoppingItems.size() - 1);
                     updateRecyclerViewVisibility();
                     Toast.makeText(ShoppingListActivity.this, "Item added", Toast.LENGTH_SHORT).show();
