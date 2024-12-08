@@ -42,6 +42,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import com.example.freshlife.utils.DataFetcher;
 import com.example.freshlife.utils.RecyclerViewSwipeDecorator;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -325,7 +326,8 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         EditText quantityEditText = dialogView.findViewById(R.id.dialogQuantityEditText);
         TextView expirationDateTextView = dialogView.findViewById(R.id.dialogExpirationDateTextView);
         Spinner categorySpinner = dialogView.findViewById(R.id.dialogCategorySpinner);
-        Spinner locationSpinner = dialogView.findViewById(R.id.dialogLocationSpinner);
+//        Spinner locationSpinner = dialogView.findViewById(R.id.dialogLocationSpinner);
+        MaterialButtonToggleGroup locationToggleGroup = dialogView.findViewById(R.id.locationToggleGroup);
         CheckBox replenishCheckBox = dialogView.findViewById(R.id.dialogReplenishCheckBox);
 
         // Set up category spinner
@@ -335,13 +337,15 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         categorySpinner.setAdapter(adapter);
 
         // Populate location spinner
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                locations.subList(1, locations.size()) // Exclude "All"
-        );
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        locationSpinner.setAdapter(spinnerAdapter);
+//        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+//                this,
+//                android.R.layout.simple_spinner_item,
+//                locations.subList(1, locations.size()) // Exclude "All"
+//        );
+//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        locationSpinner.setAdapter(spinnerAdapter);
+
+
 
         // Set up expiration date picker
         expirationDateTextView.setOnClickListener(v -> {
@@ -377,8 +381,19 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
             String quantityStr = quantityEditText.getText().toString().trim();
             String expirationDate = expirationDateTextView.getText().toString().trim();
             String category = categorySpinner.getSelectedItem().toString();
-            String location = locationSpinner.getSelectedItem().toString();
+//            String location = locationSpinner.getSelectedItem().toString();
             boolean replenishAutomatically = replenishCheckBox.isChecked();
+
+            String location;
+            int selectedButtonId = locationToggleGroup.getCheckedButtonId();
+            if (selectedButtonId == R.id.buttonFridge) {
+                location = "Fridge";
+            } else if (selectedButtonId == R.id.buttonPantry) {
+                location = "Pantry";
+            } else {
+                // Default location
+                location = "Fridge";
+            }
 
             // Validate inputs
             if (name.isEmpty()) {
@@ -478,13 +493,19 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         EditText quantityEditText = dialogView.findViewById(R.id.dialogQuantityEditText);
         TextView expirationDateTextView = dialogView.findViewById(R.id.dialogExpirationDateTextView);
         Spinner categorySpinner = dialogView.findViewById(R.id.dialogCategorySpinner);
-        Spinner locationSpinner = dialogView.findViewById(R.id.dialogLocationSpinner);
+//        Spinner locationSpinner = dialogView.findViewById(R.id.dialogLocationSpinner);
+        MaterialButtonToggleGroup locationToggleGroup = dialogView.findViewById(R.id.locationToggleGroup);
         CheckBox replenishCheckBox = dialogView.findViewById(R.id.dialogReplenishCheckBox);
 
         // Populate the fields with existing data
         foodNameEditText.setText(foodItem.getName());
         quantityEditText.setText(String.valueOf(foodItem.getQuantity()));
         expirationDateTextView.setText(foodItem.getExpirationDate());
+        if (foodItem.getLocation().equals("Fridge")) {
+            locationToggleGroup.check(R.id.buttonFridge);
+        } else {
+            locationToggleGroup.check(R.id.buttonPantry);
+        }
         replenishCheckBox.setChecked(foodItem.getReplenishAutomatically());
 
         // Populate category spinner
@@ -495,16 +516,16 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         categorySpinner.setSelection(getCategoryIndex(foodItem.getCategory(), categories));
 
         // Populate location spinner
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                locations.subList(1, locations.size()) // Exclude "All"
-        );
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        locationSpinner.setAdapter(spinnerAdapter);
-
-        // Pre-select the correct location for editing
-        locationSpinner.setSelection(spinnerAdapter.getPosition(foodItem.getLocation()));
+//        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+//                this,
+//                android.R.layout.simple_spinner_item,
+//                locations.subList(1, locations.size()) // Exclude "All"
+//        );
+//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        locationSpinner.setAdapter(spinnerAdapter);
+//
+//        // Pre-select the correct location for editing
+//        locationSpinner.setSelection(spinnerAdapter.getPosition(foodItem.getLocation()));
 
         // Set up expiration date picker
         expirationDateTextView.setOnClickListener(v -> {
@@ -540,8 +561,18 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
             String quantityStr = quantityEditText.getText().toString().trim();
             String expirationDate = expirationDateTextView.getText().toString().trim();
             String category = categorySpinner.getSelectedItem().toString();
-            String location = locationSpinner.getSelectedItem().toString();
             boolean replenishAutomatically = replenishCheckBox.isChecked();
+
+            // Get the selected location from the MaterialButtonToggleGroup
+            String location;
+            int selectedButtonId = locationToggleGroup.getCheckedButtonId();
+            if (selectedButtonId == R.id.buttonFridge) {
+                location = "Fridge";
+            } else if (selectedButtonId == R.id.buttonPantry) {
+                location = "Pantry";
+            } else {
+                location = "Fridge"; // Default location
+            }
 
             // Validate inputs
             if (name.isEmpty()) {
