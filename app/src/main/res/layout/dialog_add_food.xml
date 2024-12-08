@@ -65,13 +65,13 @@
         android:layout_marginTop="16dp"
         app:singleSelection="true"
         app:selectionRequired="true"
-        app:checkedButton="@id/buttonFridge"
+        app:checkedButton="@id/buttonToggleFridge"
         app:layout_constraintTop_toBottomOf="@id/dialogCategorySpinner"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonFridge"
+                android:id="@+id/buttonToggleFridge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Fridge"
@@ -79,7 +79,7 @@
                 style="?attr/materialButtonOutlinedStyle"/>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonPantry"
+                android:id="@+id/buttonTogglePantry"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Pantry"

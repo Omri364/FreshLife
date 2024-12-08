@@ -5,13 +5,13 @@
       <entry key="InventoryActivityTest">
         <State />
       </entry>
-      <entry key="ShoppingActivityTest">
-        <State />
-      </entry>
       <entry key="app">
         <State />
       </entry>
       <entry key="testAddEmptyItem()">
+        <State />
+      </entry>
+      <entry key="testEditFoodItem()">
         <State />
       </entry>
     </value>

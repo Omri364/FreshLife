@@ -63,7 +63,7 @@ import android.Manifest;
 public class InventoryActivity extends AppCompatActivity implements FoodAdapter.OnDeleteClickListener {
 
     private String userUid;
-    private String token;
+//    private String token;
     private RecyclerView foodItemsRecyclerView;
     private Spinner sortSpinner;
     private FoodAdapter foodAdapter;
@@ -109,7 +109,7 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         // Retrieve the UID from SharedPreferences
         sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
         userUid = sharedPreferences.getString("uid", null);
-        token = "Bearer " + sharedPreferences.getString("authToken", null);
+//        token = "Bearer " + sharedPreferences.getString("authToken", null);
 
         if (userUid == null) {
             // If UID is null, redirect to Login
@@ -266,6 +266,8 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
     }
 
     private void deleteFoodItem(FoodItem foodItem, int position) {
+        String token = "Bearer " + sharedPreferences.getString("authToken", null);
+
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
         Call<Void> call = apiService.deleteFoodItem(token, foodItem.getId());
 
@@ -326,7 +328,6 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         EditText quantityEditText = dialogView.findViewById(R.id.dialogQuantityEditText);
         TextView expirationDateTextView = dialogView.findViewById(R.id.dialogExpirationDateTextView);
         Spinner categorySpinner = dialogView.findViewById(R.id.dialogCategorySpinner);
-//        Spinner locationSpinner = dialogView.findViewById(R.id.dialogLocationSpinner);
         MaterialButtonToggleGroup locationToggleGroup = dialogView.findViewById(R.id.locationToggleGroup);
         CheckBox replenishCheckBox = dialogView.findViewById(R.id.dialogReplenishCheckBox);
 
@@ -335,17 +336,6 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(adapter);
-
-        // Populate location spinner
-//        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
-//                this,
-//                android.R.layout.simple_spinner_item,
-//                locations.subList(1, locations.size()) // Exclude "All"
-//        );
-//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        locationSpinner.setAdapter(spinnerAdapter);
-
-
 
         // Set up expiration date picker
         expirationDateTextView.setOnClickListener(v -> {
@@ -381,14 +371,13 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
             String quantityStr = quantityEditText.getText().toString().trim();
             String expirationDate = expirationDateTextView.getText().toString().trim();
             String category = categorySpinner.getSelectedItem().toString();
-//            String location = locationSpinner.getSelectedItem().toString();
             boolean replenishAutomatically = replenishCheckBox.isChecked();
 
             String location;
             int selectedButtonId = locationToggleGroup.getCheckedButtonId();
-            if (selectedButtonId == R.id.buttonFridge) {
+            if (selectedButtonId == R.id.buttonToggleFridge) {
                 location = "Fridge";
-            } else if (selectedButtonId == R.id.buttonPantry) {
+            } else if (selectedButtonId == R.id.buttonTogglePantry) {
                 location = "Pantry";
             } else {
                 // Default location
@@ -459,10 +448,10 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
 
     // Add item to shopping list
     private void addToShoppingList(FoodItem foodItem) {
+        String token = "Bearer " + sharedPreferences.getString("authToken", null);
+
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
         ShoppingItem shoppingItem = new ShoppingItem(foodItem.getName(), false, foodItem.getCategory(), foodItem.getQuantity());
-
-//        String token = "Bearer " + sharedPreferences.getString("authToken", "");
 
         Call<ShoppingItem> call = apiService.addShoppingItem(token, shoppingItem);
         call.enqueue(new Callback<ShoppingItem>() {
@@ -502,9 +491,9 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         quantityEditText.setText(String.valueOf(foodItem.getQuantity()));
         expirationDateTextView.setText(foodItem.getExpirationDate());
         if (foodItem.getLocation().equals("Fridge")) {
-            locationToggleGroup.check(R.id.buttonFridge);
+            locationToggleGroup.check(R.id.buttonToggleFridge);
         } else {
-            locationToggleGroup.check(R.id.buttonPantry);
+            locationToggleGroup.check(R.id.buttonTogglePantry);
         }
         replenishCheckBox.setChecked(foodItem.getReplenishAutomatically());
 
@@ -514,18 +503,6 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(adapter);
         categorySpinner.setSelection(getCategoryIndex(foodItem.getCategory(), categories));
-
-        // Populate location spinner
-//        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
-//                this,
-//                android.R.layout.simple_spinner_item,
-//                locations.subList(1, locations.size()) // Exclude "All"
-//        );
-//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        locationSpinner.setAdapter(spinnerAdapter);
-//
-//        // Pre-select the correct location for editing
-//        locationSpinner.setSelection(spinnerAdapter.getPosition(foodItem.getLocation()));
 
         // Set up expiration date picker
         expirationDateTextView.setOnClickListener(v -> {
@@ -566,9 +543,9 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
             // Get the selected location from the MaterialButtonToggleGroup
             String location;
             int selectedButtonId = locationToggleGroup.getCheckedButtonId();
-            if (selectedButtonId == R.id.buttonFridge) {
+            if (selectedButtonId == R.id.buttonToggleFridge) {
                 location = "Fridge";
-            } else if (selectedButtonId == R.id.buttonPantry) {
+            } else if (selectedButtonId == R.id.buttonTogglePantry) {
                 location = "Pantry";
             } else {
                 location = "Fridge"; // Default location
@@ -606,7 +583,7 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
     private void updateFoodItem(FoodItem foodItem) {
         foodItem.setUid(userUid); // Attach UID to the food item
 
-//        String token = "Bearer " + sharedPreferences.getString("authToken", "");
+        String token = "Bearer " + sharedPreferences.getString("authToken", null);
 
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
         Call<FoodItem> call = apiService.updateFoodItem(token, foodItem.getId(), foodItem);
