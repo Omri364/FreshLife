@@ -33,11 +33,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -188,6 +190,24 @@ public class InventoryActivityTest {
         onView(withId(R.id.buttonFridge)).perform(click());
         onView(withText(testItemName)).check(matches(Matchers.not(isDisplayed())));
     }
+
+    @After
+    public void logOutUser() {
+        // Log the user out from Firebase
+        FirebaseAuth.getInstance().signOut();
+        FirebaseApp.getInstance().delete();
+
+        // Clear the token and other data from SharedPreferences
+        Context context = ApplicationProvider.getApplicationContext();
+        SharedPreferences sharedPreferences = context.getSharedPreferences("FreshLifePrefs", Context.MODE_PRIVATE);
+        sharedPreferences.edit()
+                .remove("authToken") // Remove the token
+                .apply();
+
+        Log.d("InventoryActivityTest", "Signed out after test");
+
+    }
+
 
     // Custom matcher to find RecyclerView items
     private static Matcher<View> hasDescendant(final Matcher<View> matcher) {

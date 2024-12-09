@@ -93,8 +93,22 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
 
-        // If the user is already logged in, navigate directly to InventoryActivity
-        if (firebaseAuth.getCurrentUser() != null) {
+//        // If the user is already logged in, navigate directly to InventoryActivity
+//        if (firebaseAuth.getCurrentUser() != null) {
+//            navigateToInventory();
+//        }
+
+        // Check if a valid token exists in SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
+        String token = sharedPreferences.getString("authToken", null);
+
+        // If the user is authenticated but no valid token exists, sign them out
+        if (firebaseAuth.getCurrentUser() != null && token == null) {
+            firebaseAuth.signOut();
+        }
+
+        // If a valid token exists, navigate to InventoryActivity
+        if (firebaseAuth.getCurrentUser() != null && token != null) {
             navigateToInventory();
         }
 
@@ -262,6 +276,13 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("FirebaseAuth", "Firebase authentication failed", task.getException());
                     }
                 });
+    }
+
+    // Public method to check authentication for testing
+    public boolean isUserAuthenticated() {
+        SharedPreferences sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
+        String token = sharedPreferences.getString("authToken", null);
+        return firebaseAuth.getCurrentUser() != null && token != null;
     }
 
 }

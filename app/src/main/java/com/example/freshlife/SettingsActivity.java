@@ -54,6 +54,8 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
+
+
         // Initialize FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
 

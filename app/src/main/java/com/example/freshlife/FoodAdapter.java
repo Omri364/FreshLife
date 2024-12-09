@@ -111,7 +111,6 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
             super(itemView);
             foodNameTextView = itemView.findViewById(R.id.foodNameTextView);
             expirationInfoTextView = itemView.findViewById(R.id.expirationInfoTextView);
-            deleteButton = itemView.findViewById(R.id.deleteButton);
             categoryIcon = itemView.findViewById(R.id.categoryIcon);
             quantityTextView = itemView.findViewById(R.id.quantityTextView);
         }
