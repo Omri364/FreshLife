@@ -5,6 +5,7 @@ FreshLife is an Android app designed to help users track food items in their inv
 ## Screenshots
 <div style="display: flex; justify-content: space-around;">
   <img src="assets/snapshots/snapshot_login.png" alt="Login Screen" width="80"/>
+  <img src="assets/snapshots/snapshot_inventory.png" alt="Inventory Screen" width="80"/>
   <img src="assets/snapshots/snapshot_add_item.png" alt="Inventory Add Item Screen" width="80"/>
   <img src="assets/snapshots/snapshot_shopping_list.png" alt="Shopping List Screen" width="80"/>
 </div>
