@@ -34,6 +34,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * The `ShoppingListActivity` class manages the shopping list functionality in the app.
+ * Users can view, add, edit, delete, and sort shopping list items, as well as mark them as checked.
+ */
 public class ShoppingListActivity extends AppCompatActivity {
 
     private String authToken;
@@ -48,14 +52,12 @@ public class ShoppingListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
 
-        // Retrieve the UID from SharedPreferences
+        // Retrieve the user's token from SharedPreferences
         sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", null);
 
-//        Log.e("ShoppingListActivity", "Token i received: " + authToken);
-
         if (authToken == null) {
-            // If UID is null, redirect to Login
+            // If token is null, redirect to Login
             startActivity(new Intent(this, MainActivity.class));
             finish();
             return;
@@ -122,6 +124,9 @@ public class ShoppingListActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Fetches the shopping items from the backend and updates the RecyclerView.
+     */
     private void fetchShoppingItems() {
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
         Call<List<ShoppingItem>> call = apiService.getShoppingItems("Bearer " + authToken);
@@ -216,6 +221,9 @@ public class ShoppingListActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
+    /**
+     * Shows the dialog for adding a new shopping item.
+     */
     private void showAddProductDialog() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.dialog_add_product, null);
@@ -262,6 +270,13 @@ public class ShoppingListActivity extends AppCompatActivity {
         sortShoppingItems(sortSpinner.getSelectedItemPosition());
     }
 
+    /**
+     * Adds or updates a shopping item in the list and backend.
+     *
+     * @param name     The name of the item.
+     * @param quantity The quantity of the item.
+     * @param category The category of the item.
+     */
     private void addOrUpdateShoppingItem(String name, int quantity, String category) {
         ShoppingItem existingItem = null;
         for (ShoppingItem item : shoppingItems) {
@@ -308,6 +323,11 @@ public class ShoppingListActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Updates a shopping item in the backend.
+     *
+     * @param item The item to update.
+     */
     private void updateShoppingItem(ShoppingItem item) {
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
         Call<ShoppingItem> call = apiService.updateShoppingItem("Bearer " + authToken, item.getId(), item);
@@ -425,6 +445,11 @@ public class ShoppingListActivity extends AppCompatActivity {
         sortShoppingItems(0); // Default to "Sort by A-Z"
     }
 
+    /**
+     * Sorts the shopping list based on the selected option.
+     *
+     * @param sortOption The selected sorting option (0 = A-Z, 1 = Category).
+     */
     private void sortShoppingItems(int sortOption) {
         List<ShoppingItem> uncheckedItems = new ArrayList<>();
         List<ShoppingItem> checkedItems = new ArrayList<>();

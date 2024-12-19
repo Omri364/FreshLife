@@ -60,10 +60,15 @@ import android.view.LayoutInflater;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import android.Manifest;
 
+/**
+ * Activity for managing the inventory of food items.
+ * This activity allows the user to add, edit, delete, and view food items
+ * stored in their inventory. It also provides filtering and sorting options
+ * based on storage location and other criteria.
+ */
 public class InventoryActivity extends AppCompatActivity implements FoodAdapter.OnDeleteClickListener {
 
     private String userUid;
-//    private String token;
     private RecyclerView foodItemsRecyclerView;
     private Spinner sortSpinner;
     private FoodAdapter foodAdapter;
@@ -71,26 +76,7 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
     private static final int REQUEST_NOTIFICATION_PERMISSION = 1;
     private List<String> locations = new ArrayList<>(Arrays.asList("All", "Fridge", "Pantry"));
     private String selectedLocation = "All";
-    private static final String LOCATIONS_KEY = "locations_key";
     private SharedPreferences sharedPreferences;
-
-
-    // Define the ActivityResultLauncher
-    private final ActivityResultLauncher<Intent> addFoodItemLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    // Get the new FoodItem from the result
-                    FoodItem newFoodItem = (FoodItem) result.getData().getSerializableExtra("newFoodItem");
-
-                    // Add the new item to the list and notify the adapter
-                    if (newFoodItem != null) {
-                        foodItems.add(newFoodItem);
-                        foodAdapter.notifyItemInserted(foodItems.size() - 1);  // Notify the adapter
-                    }
-                }
-            }
-    );
 
     @Override
     protected void onStart() {
@@ -109,7 +95,6 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         // Retrieve the UID from SharedPreferences
         sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
         userUid = sharedPreferences.getString("uid", null);
-//        token = "Bearer " + sharedPreferences.getString("authToken", null);
 
         if (userUid == null) {
             // If UID is null, redirect to Login
@@ -229,6 +214,26 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         itemTouchHelper.attachToRecyclerView(foodItemsRecyclerView);
     }
 
+    // Define the ActivityResultLauncher
+    private final ActivityResultLauncher<Intent> addFoodItemLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    // Get the new FoodItem from the result
+                    FoodItem newFoodItem = (FoodItem) result.getData().getSerializableExtra("newFoodItem");
+
+                    // Add the new item to the list and notify the adapter
+                    if (newFoodItem != null) {
+                        foodItems.add(newFoodItem);
+                        foodAdapter.notifyItemInserted(foodItems.size() - 1);  // Notify the adapter
+                    }
+                }
+            }
+    );
+
+    /**
+     * Fetches food items from the backend for the authenticated user.
+     */
     private void fetchFoodItems() {
         DataFetcher.fetchFoodItemsFromDatabase(this, foodItems -> {
             // Clear and update the list
@@ -243,8 +248,7 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
 
             // Schedule notifications for fetched items
             Log.d("InventoryActivity", "Scheduling notifications for fetched items.");
-            NotificationScheduler.scheduleNotifications(this, foodItems);
-        }, userUid);
+            NotificationScheduler.scheduleNotifications(this, foodItems);});
     }
 
     @Override
@@ -290,30 +294,6 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 Toast.makeText(InventoryActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-
-    // Sorting methods
-    private void sortAlphabetically() {
-        Collections.sort(foodItems, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
-    }
-
-    private void sortByCategory() {
-        Collections.sort(foodItems, (o1, o2) -> o1.getCategory().compareToIgnoreCase(o2.getCategory()));
-    }
-
-    private void sortByExpiration() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Collections.sort(foodItems, (o1, o2) -> {
-            try {
-                Date date1 = sdf.parse(o1.getExpirationDate());
-                Date date2 = sdf.parse(o2.getExpirationDate());
-                return date1.compareTo(date2);
-            } catch (ParseException e) {
-                e.printStackTrace();
-                return 0;
             }
         });
     }
@@ -406,9 +386,11 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         });
     }
 
+    /**
+     * Add the food item to inventory
+     * @param foodItem
+     */
     private void addFoodItem(FoodItem foodItem) {
-        //TODO: change to simpler way
-
         FirebaseAuth.getInstance().getCurrentUser().getIdToken(true).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String token = task.getResult().getToken();
@@ -445,8 +427,11 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         });
     }
 
-
-    // Add item to shopping list
+    /**
+     * Add item to shopping list.
+     *
+     * @param foodItem The food item to add.
+     */
     private void addToShoppingList(FoodItem foodItem) {
         String token = "Bearer " + sharedPreferences.getString("authToken", null);
 
@@ -472,7 +457,12 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
     }
 
 
-    // Show edit food item dialog
+    /**
+     * Displays a dialog for editing an existing food item in the inventory.
+     *
+     * @param foodItem The food item to edit.
+     * @param position The position of the food item in the list.
+     */
     private void showEditFoodDialog(FoodItem foodItem, int position) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.dialog_add_food, null);
@@ -482,7 +472,6 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         EditText quantityEditText = dialogView.findViewById(R.id.dialogQuantityEditText);
         TextView expirationDateTextView = dialogView.findViewById(R.id.dialogExpirationDateTextView);
         Spinner categorySpinner = dialogView.findViewById(R.id.dialogCategorySpinner);
-//        Spinner locationSpinner = dialogView.findViewById(R.id.dialogLocationSpinner);
         MaterialButtonToggleGroup locationToggleGroup = dialogView.findViewById(R.id.locationToggleGroup);
         CheckBox replenishCheckBox = dialogView.findViewById(R.id.dialogReplenishCheckBox);
 
@@ -579,7 +568,10 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         });
     }
 
-    // Update food item on the backend
+    /**
+     * Update food item on the backend
+     * @param foodItem
+     */
     private void updateFoodItem(FoodItem foodItem) {
         foodItem.setUid(userUid); // Attach UID to the food item
 
@@ -609,7 +601,12 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         });
     }
 
-    // Get category index for spinner
+    /**
+     * Get category index for spinner
+     * @param category
+     * @param categories
+     * @return
+     */
     private int getCategoryIndex(String category, String[] categories) {
         for (int i = 0; i < categories.length; i++) {
             if (categories[i].equalsIgnoreCase(category)) {
@@ -619,6 +616,9 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         return 0; // Default to the first category
     }
 
+    /**
+     * Filters and sorts the food items based on the selected location and sorting criteria.
+     */
     private void filterAndSortFoodItems() {
         List<FoodItem> filteredItems = new ArrayList<>();
 
@@ -671,6 +671,9 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         }
     }
 
+    /**
+     * Add buttons for viewing list of specific storage location.
+     */
     private void setupLocationButtons() {
         Button buttonAll = findViewById(R.id.buttonAll);
         Button buttonFridge = findViewById(R.id.buttonFridge);
@@ -706,6 +709,10 @@ public class InventoryActivity extends AppCompatActivity implements FoodAdapter.
         filterAndSortFoodItems();
     }
 
+    /**
+     * Apply the dark mode theme.
+     * @param isDarkMode
+     */
     private void applyDarkMode(boolean isDarkMode) {
         if (isDarkMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);

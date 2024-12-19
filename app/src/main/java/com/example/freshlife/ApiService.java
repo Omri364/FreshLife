@@ -12,6 +12,10 @@ import retrofit2.http.Path;
 import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
+/**
+ * Retrofit interface for interacting with the application's backend API.
+ * Defines endpoints for managing food items and shopping items.
+ */
 public interface ApiService {
     // Retrieve food items for the user
     @GET("food-items")

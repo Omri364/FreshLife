@@ -19,6 +19,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * RecyclerView adapter for displaying food items in the inventory.
+ * Handles binding data to the views and managing user interactions.
+ */
 public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder> {
 
     private List<FoodItem> foodItemList;
@@ -26,6 +30,14 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     private Context context;
     private final OnEditClickListener editClickListener;
 
+    /**
+     * Constructor for initializing the adapter with the necessary data and listeners.
+     *
+     * @param context           The context in which the RecyclerView is used.
+     * @param foodItemList      The list of food items to display.
+     * @param listener          Listener for handling delete actions.
+     * @param editClickListener Listener for handling edit actions.
+     */
     public FoodAdapter(Context context, List<FoodItem> foodItemList, OnDeleteClickListener listener, OnEditClickListener editClickListener) {
         this.context = context;
         this.foodItemList = foodItemList;
@@ -87,9 +99,6 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
                 break;
         }
 
-//        // Handle delete button click
-//        holder.deleteButton.setOnClickListener(v -> onDeleteClickListener.onDeleteClick(foodItem, position));
-
         // Handle item click for editing
         holder.itemView.setOnClickListener(v -> editClickListener.onEditClick(foodItem, position));
     }
@@ -103,7 +112,6 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     public static class FoodViewHolder extends RecyclerView.ViewHolder {
         TextView foodNameTextView;
         TextView expirationInfoTextView;
-        ImageButton deleteButton;
         ImageView categoryIcon;
         TextView quantityTextView;
 
@@ -126,6 +134,12 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         void onEditClick(FoodItem foodItem, int position);
     }
 
+    /**
+     * Calculates the days remaining until the expiration of a food item.
+     *
+     * @param expirationDate The expiration date in "yyyy-MM-dd" format.
+     * @return A string describing the days until expiration or expiration status.
+     */
     private String calculateDaysUntilExpiration(String expirationDate) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try {
@@ -157,6 +171,12 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         }
     }
 
+    /**
+     * Determines the background color of an item based on its expiration date.
+     *
+     * @param expirationDate The expiration date in "yyyy-MM-dd" format.
+     * @return The color resource ID for the background.
+     */
     private int determineBackgroundColor(String expirationDate) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try {
@@ -181,7 +201,11 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         }
     }
 
-    // Updates the food item list and refreshes the RecyclerView
+    /**
+     * Updates the food item list and refreshes the RecyclerView.
+     *
+     * @param newFoodItemList The updated list of food items.
+     */
     public void updateList(List<FoodItem> newFoodItemList) {
         this.foodItemList = new ArrayList<>(newFoodItemList);
         notifyDataSetChanged();

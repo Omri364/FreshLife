@@ -16,6 +16,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Handles user registration for the FreshLife app.
+ * This activity provides a registration form for new users to sign up using email and password.
+ * Upon successful registration, it saves the user's Firebase ID token in SharedPreferences for authentication.
+ */
 public class RegistrationActivity extends AppCompatActivity {
 
     private EditText editTextEmail, editTextPassword, editTextConfirmPassword;
@@ -41,6 +46,10 @@ public class RegistrationActivity extends AppCompatActivity {
         buttonRegister.setOnClickListener(v -> registerUser());
     }
 
+    /**
+     * Registers a new user with Firebase Authentication using the provided email and password.
+     * Validates the user input, displays progress, and handles success or failure scenarios.
+     */
     private void registerUser() {
         // Get inputs from the user
         String email = editTextEmail.getText().toString().trim();

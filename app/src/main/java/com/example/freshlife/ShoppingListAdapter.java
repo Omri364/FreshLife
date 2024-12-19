@@ -13,12 +13,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The `ShoppingListAdapter` class is the RecyclerView adapter for displaying shopping list items.
+ * It manages the list of items, their display, and user interactions such as checking off items or editing them.
+ */
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewHolder> {
 
     private List<ShoppingItem> shoppingItems;
     private Context context;
     private final OnEditClickListener editClickListener;
 
+    /**
+     * Constructor for the `ShoppingListAdapter`.
+     *
+     * @param context           The context in which the adapter is used.
+     * @param shoppingItems     The list of shopping items to display.
+     * @param editClickListener The listener for edit click events.
+     */
     public ShoppingListAdapter(Context context, List<ShoppingItem> shoppingItems, OnEditClickListener editClickListener) {
         this.context = context;
         this.shoppingItems = shoppingItems;
@@ -68,8 +79,6 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         // Set quantity
         holder.quantityTextView.setText("Qty: " + item.getQuantity());
 
-        //TODO: put in a helper class
-        // Set category icon based on category
         switch (item.getCategory()) {
             case "Dairy":
                 holder.categoryIcon.setImageResource(R.drawable.ic_category_dairy);
@@ -106,6 +115,9 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         return shoppingItems.size();
     }
 
+    /**
+     * Updates lists of checked and unchecked items
+     */
     private void moveCheckedItems() {
         List<ShoppingItem> uncheckedItems = new ArrayList<>();
         List<ShoppingItem> checkedItems = new ArrayList<>();
@@ -140,7 +152,9 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         }
     }
 
-    // Interface for item edit click listener
+    /**
+     * Interface for item edit click listener
+     */
     public interface OnEditClickListener {
         void onEditClick(ShoppingItem shoppingItem, int position);
     }

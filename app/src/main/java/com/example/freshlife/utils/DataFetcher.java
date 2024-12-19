@@ -15,12 +15,30 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Utility class for fetching data from the backend.
+ */
 public class DataFetcher {
+
+    /**
+     * Callback interface for handling the fetched food items.
+     */
     public interface FoodItemsCallback {
+        /**
+         * Called when food items are fetched from the database.
+         *
+         * @param foodItems The list of fetched food items.
+         */
         void onFoodItemsFetched(List<FoodItem> foodItems);
     }
 
-    public static void fetchFoodItemsFromDatabase(Context context, FoodItemsCallback callback, String userUid) {
+    /**
+     * Fetches food items for the currently authenticated user from the backend.
+     *
+     * @param context  The application context used to retrieve the shared preferences.
+     * @param callback A callback that handles the fetched food items.
+     */
+    public static void fetchFoodItemsFromDatabase(Context context, FoodItemsCallback callback) {
         String token = context.getSharedPreferences("FreshLifePrefs", Context.MODE_PRIVATE).getString("authToken", "");
         ApiService apiService = RetrofitInstance.getRetrofitInstance().create(ApiService.class);
         Call<List<FoodItem>> call = apiService.getFoodItems("Bearer " + token);

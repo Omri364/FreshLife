@@ -13,7 +13,18 @@ import androidx.core.app.NotificationManagerCompat;
 import android.Manifest;
 import android.util.Log;
 
+/**
+ * The `NotificationReceiver` class handles the display of notifications for expiring food items.
+ * It extends `BroadcastReceiver` and is triggered when the scheduled alarm for a notification fires.
+ */
 public class NotificationReceiver extends BroadcastReceiver {
+    /**
+     * Called when the `BroadcastReceiver` receives a broadcast.
+     * This method is responsible for creating and displaying a notification for an expiring item.
+     *
+     * @param context The context in which the receiver is running.
+     * @param intent  The intent containing additional data for the notification (e.g., item name).
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
         String itemName = intent.getStringExtra("itemName");
@@ -39,7 +50,11 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
     }
 
-
+    /**
+     * Creates a notification channel for devices running Android O or higher.
+     *
+     * @param context The context in which the channel is created.
+     */
     private void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "FreshLife Channel";

@@ -73,7 +73,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-
+/**
+ * The `MainActivity` class serves as the entry point of the application.
+ * It provides the login interface and handles user authentication via email/password
+ * and Google Sign-In. Additionally, it includes navigation to the registration activity
+ * and password recovery functionality.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private TextView registerLink, forgotPasswordLink;
@@ -92,11 +97,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
-
-//        // If the user is already logged in, navigate directly to InventoryActivity
-//        if (firebaseAuth.getCurrentUser() != null) {
-//            navigateToInventory();
-//        }
 
         // Check if a valid token exists in SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Configure Google Sign-In
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)) // Get this from google-services.json
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
 
@@ -161,6 +161,10 @@ public class MainActivity extends AppCompatActivity {
         googleLoginButton.setOnClickListener(v -> handleGoogleSignIn());
     }
 
+    /**
+     * Logs in the user using email and password.
+     * Validates user input, authenticates with Firebase, and saves the ID token to SharedPreferences.
+     */
     private void loginUser() {
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
@@ -211,17 +215,26 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Navigates to the InventoryActivity.
+     */
     private void navigateToInventory() {
         Intent intent = new Intent(MainActivity.this, InventoryActivity.class);
         startActivity(intent);
         finish();
     }
 
+    /**
+     * Navigates to the RegistrationActivity.
+     */
     private void navigateToRegistration() {
         Intent intent = new Intent(MainActivity.this, RegistrationActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Handles Google Sign-In by launching the account picker dialog.
+     */
     private void handleGoogleSignIn() {
         // Sign out from GoogleSignInClient to force account picker dialog
         googleSignInClient.signOut().addOnCompleteListener(task -> {
@@ -247,7 +260,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * Authenticates the user with Firebase using Google credentials and saves the ID token.
+     *
+     * @param idToken The Google ID token.
+     */
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         FirebaseAuth.getInstance().signInWithCredential(credential)
@@ -278,7 +295,11 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    // Public method to check authentication for testing
+    /**
+     * Public method for testing user authentication.
+     *
+     * @return True if the user is authenticated, false otherwise.
+     */
     public boolean isUserAuthenticated() {
         SharedPreferences sharedPreferences = getSharedPreferences("FreshLifePrefs", MODE_PRIVATE);
         String token = sharedPreferences.getString("authToken", null);

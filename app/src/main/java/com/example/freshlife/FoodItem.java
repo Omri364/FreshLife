@@ -3,6 +3,11 @@ package com.example.freshlife;
 import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
+/**
+ * Represents a food item in the inventory.
+ * This class includes all the necessary fields to store details about a food item,
+ * such as its name, quantity, expiration date, and category.
+ */
 public class FoodItem implements Serializable {
     @SerializedName("_id")  // Maps MongoDB's _id to id
     private String id;
@@ -14,7 +19,17 @@ public class FoodItem implements Serializable {
     private boolean replenishAutomatically;
     private String location;
 
-    // Constructor
+    /**
+     * Constructor for creating a FoodItem.
+     *
+     * @param uid                  The Firebase UID of the user.
+     * @param name                 The name of the food item.
+     * @param quantity             The quantity of the food item.
+     * @param expirationDate       The expiration date of the food item.
+     * @param category             The category of the food item.
+     * @param replenishAutomatically Whether the item should be replenished automatically.
+     * @param location             The storage location of the food item.
+     */
     public FoodItem(String uid, String name, int quantity, String expirationDate, String category,
                     boolean replenishAutomatically, String location) {
         this.uid = uid;
@@ -26,17 +41,6 @@ public class FoodItem implements Serializable {
         this.location = location;
     }
 
-    public FoodItem(String id, String uid, String name, int quantity, String expirationDate, String category,
-                    boolean replenishAutomatically, String location) {
-        this.uid = uid;
-        this.id = id;
-        this.name = name;
-        this.quantity = quantity;
-        this.expirationDate = expirationDate;
-        this.category = category;
-        this.replenishAutomatically = replenishAutomatically;
-        this.location = location;
-    }
 
     // Getters
     public String getId() {

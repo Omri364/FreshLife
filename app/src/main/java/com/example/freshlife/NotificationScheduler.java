@@ -18,8 +18,19 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * The `NotificationScheduler` class is responsible for scheduling notifications
+ * for food items based on their expiration date. Notifications are triggered
+ * using the `AlarmManager` and handled by the `NotificationReceiver` class.
+ */
 public class NotificationScheduler {
 
+    /**
+     * Schedules notifications for all provided food items based on user preferences.
+     *
+     * @param context   The context in which the notifications are scheduled.
+     * @param foodItems The list of food items for which notifications should be scheduled.
+     */
     public static void scheduleNotifications(Context context, List<FoodItem> foodItems) {
         // Get preferences for notification timing
         SharedPreferences prefs = context.getSharedPreferences("FreshLifePrefs", Context.MODE_PRIVATE);
@@ -32,13 +43,21 @@ public class NotificationScheduler {
         for (FoodItem item : foodItems) {
             long notificationTime = calculateNotificationTime(item.getExpirationDate(), daysBefore, hour, minute);
 
-//            // Ensure the notification time is in the future
+            // Ensure the notification time is in the future
             if (notificationTime > System.currentTimeMillis()) {
                 scheduleNotification(context, item.getName(), notificationTime, item.getId().hashCode());
             }
         }
     }
 
+    /**
+     * Schedules a notification for a specific food item at the specified time.
+     *
+     * @param context        The context in which the notification is scheduled.
+     * @param itemName       The name of the food item.
+     * @param triggerTime    The time at which the notification should be triggered.
+     * @param notificationId A unique ID for the notification.
+     */
     public static void scheduleNotification(Context context, String itemName, long triggerTime, int notificationId) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -59,18 +78,15 @@ public class NotificationScheduler {
         alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
     }
 
-    private static long parseDateToMillis(String date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        try {
-            long millis = sdf.parse(date).getTime();
-            Log.d("NotificationScheduler", "Parsed millis for date " + date + ": " + millis);
-            return millis;
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
+    /**
+     * Calculates the time in milliseconds for triggering a notification.
+     *
+     * @param expirationDate The expiration date of the food item in "yyyy-MM-dd" format.
+     * @param daysBefore     The number of days before expiration to notify.
+     * @param hour           The hour at which the notification should be triggered.
+     * @param minute         The minute at which the notification should be triggered.
+     * @return The calculated time in milliseconds.
+     */
     private static long calculateNotificationTime(String expirationDate, int daysBefore, int hour, int minute) {
         // Parse the expiration date (e.g., "2024-11-21") into milliseconds
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
